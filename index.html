@@ -613,6 +613,7 @@ header.top .passages{display:none}
     </div>
 
     <div id="paneFree" hidden>
+      <p class="hint" style="margin:0 0 8px">Mẹo: bấm <kbd>Tab</kbd> để chèn mũi tên → giữa các từ khoá. Muốn rời ô, bấm Esc rồi Tab (hoặc Shift+Tab).</p>
       <textarea class="notes-free" id="freeNotes" aria-label="Ghi chú tự do" placeholder="Ghi nhanh từ khoá khi nghe…&#10;vd: cities → hotter → countryside&#10;because roads, buildings absorb sun"></textarea>
     </div>
 
@@ -1471,6 +1472,19 @@ window.addEventListener("resize",()=>{ if(S.mode==="bank") renderBoard(); });
 function updateWC(){ const n=words($("recon").value).length; $("wc").textContent=`${n} từ / bài gốc ${words(S.p.text).length} từ`; }
 $("recon").addEventListener("input",()=>{ updateWC(); if(S.stage<2&&$("recon").value.trim()) setStage(2); saveState(); });
 $("freeNotes").addEventListener("input",saveState);
+/* Tab = chèn mũi tên khi ghi chú nhanh (Shift+Tab và Esc rồi Tab vẫn dùng để rời ô) */
+$("freeNotes").addEventListener("keydown",e=>{
+  const ta=e.target;
+  if(e.key==="Escape"){ ta.dataset.esc="1"; return; }
+  if(e.key!=="Tab"||e.shiftKey||e.ctrlKey||e.altKey||e.metaKey){ return; }
+  if(ta.dataset.esc==="1"){ ta.dataset.esc=""; return; }
+  e.preventDefault();
+  const v=ta.value, a=ta.selectionStart, b=ta.selectionEnd;
+  const pre=a>0&&!/[\s]/.test(v[a-1])?" ":"";
+  const post=b<v.length&&/\S/.test(v[b])?" ":"";
+  ta.setRangeText(pre+"→ "+(post?"":""),a,b,"end");
+  ta.dispatchEvent(new Event("input",{bubbles:true}));
+});
 $("fromChain").onclick=()=>{
   const cs=orderedChains(); if(!cs.length){ say("Chưa có thẻ nào trên bảng."); return; }
   const t=cs.map(c=>chainText(c,false)).join("\n"); const r=$("recon");
