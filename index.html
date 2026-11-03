@@ -1472,19 +1472,29 @@ window.addEventListener("resize",()=>{ if(S.mode==="bank") renderBoard(); });
 function updateWC(){ const n=words($("recon").value).length; $("wc").textContent=`${n} từ / bài gốc ${words(S.p.text).length} từ`; }
 $("recon").addEventListener("input",()=>{ updateWC(); if(S.stage<2&&$("recon").value.trim()) setStage(2); saveState(); });
 $("freeNotes").addEventListener("input",saveState);
-/* Tab = chèn mũi tên khi ghi chú nhanh (Shift+Tab và Esc rồi Tab vẫn dùng để rời ô) */
-$("freeNotes").addEventListener("keydown",e=>{
-  const ta=e.target;
-  if(e.key==="Escape"){ ta.dataset.esc="1"; return; }
-  if(e.key!=="Tab"||e.shiftKey||e.ctrlKey||e.altKey||e.metaKey){ return; }
-  if(ta.dataset.esc==="1"){ ta.dataset.esc=""; return; }
-  e.preventDefault();
-  const v=ta.value, a=ta.selectionStart, b=ta.selectionEnd;
-  const pre=a>0&&!/[\s]/.test(v[a-1])?" ":"";
-  const post=b<v.length&&/\S/.test(v[b])?" ":"";
-  ta.setRangeText(pre+"→ "+(post?"":""),a,b,"end");
-  ta.dispatchEvent(new Event("input",{bubbles:true}));
-});
+/* Tab = chèn mũi tên khi ghi chú nhanh (Esc rồi Tab, hoặc Shift+Tab, để rời ô) */
+(function(){
+  const ta=$("freeNotes"); let esc=false;
+  const insert=()=>{
+    const v=ta.value, a=ta.selectionStart, b=ta.selectionEnd;
+    const pre=a>0&&!/\s/.test(v[a-1])?" ":"";
+    ta.setRangeText(pre+"→ ",a,b,"end");
+    ta.dispatchEvent(new Event("input",{bubbles:true}));
+  };
+  ta.addEventListener("blur",()=>{ esc=false; });
+  ta.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){ esc=true; return; }
+    if(e.key!=="Tab"&&e.key!=="Shift"&&e.key!=="Process"&&e.code!=="Tab") esc=false;
+    const isTab=e.key==="Tab"||e.code==="Tab"||(e.keyCode===9);
+    const composing=e.isComposing||e.keyCode===229;
+    if(!isTab&&!(composing&&e.code==="Tab")) return;
+    if(e.shiftKey||e.ctrlKey||e.altKey||e.metaKey) return;
+    if(esc){ esc=false; return; }
+    e.preventDefault();
+    if(composing){ setTimeout(insert,30); return; } // bộ gõ tiếng Việt đang chờ chốt chữ
+    insert();
+  });
+})();
 $("fromChain").onclick=()=>{
   const cs=orderedChains(); if(!cs.length){ say("Chưa có thẻ nào trên bảng."); return; }
   const t=cs.map(c=>chainText(c,false)).join("\n"); const r=$("recon");
