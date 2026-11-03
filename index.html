@@ -62,20 +62,21 @@ header.top p{margin:4px 0 0;color:var(--muted);max-width:60ch}
 .pbtn[aria-pressed="true"] .lv{color:var(--signal)}
 
 /* player */
-.player-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}
-@media (max-width:760px){.player-row{grid-template-columns:auto minmax(0,1fr)}.player-row .plays{grid-column:1/-1}}
+.player-row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.player-row .track{flex:1 1 200px;min-width:140px}
+.player-row .meta{flex:none;max-width:100%}
 .play{width:56px;height:56px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none}
 .play svg{width:22px;height:22px}
 .meta{display:flex;flex-direction:column;gap:2px;min-width:0}
 .meta strong{font-family:var(--f-display);font-size:18px}
 .meta small{color:var(--muted)}
-.track{display:flex;gap:4px;height:30px}
+.track{display:flex;gap:4px;height:20px}
 .seg{flex:1;border-radius:4px;background:var(--surface-2);border:0;padding:0;position:relative;overflow:hidden}
 .seg::after{content:"";position:absolute;inset:0;width:0;background:var(--accent);opacity:.85;transition:width .3s}
 .seg.past::after{width:100%}
 .seg.now::after{width:100%;background:var(--signal);animation:pulse 1.2s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.5}}
-.controls{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.controls{display:flex;gap:10px 22px;flex-wrap:wrap;align-items:center}
 .ctl{display:flex;align-items:center;gap:8px}
 .seg-toggle{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg-toggle button{border:0;background:transparent;color:var(--ink);padding:5px 10px;font-family:var(--f-mono);font-size:12.5px}
@@ -302,26 +303,16 @@ header.top .passages{display:none}
 .script .w{cursor:pointer;border-radius:4px;padding:0 1px}
 .script .w:hover,.script .w:focus-visible{background:var(--surface-2);text-decoration:underline dotted;text-underline-offset:4px}
 #flowView{display:contents}
-.loopbar{display:flex;gap:8px 22px;flex-wrap:wrap;align-items:center}
-.loopbar .dtgl,.loopbar .label{color:var(--muted)}
-.loopbar .dtcus{color:var(--muted)}
-.loopbar .dtcus input{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)}
-.loopbar .dtcus input.on{border-color:var(--signal)}
 .loopinfo{font-weight:700;color:var(--ink)}
-.panel.sticky .loopbar{flex:1 1 100%;order:4;gap:4px 18px}
+.loopbar{display:contents}
 .panel.sticky{position:sticky;top:8px;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.28);padding:10px 14px;gap:8px}
-.panel.sticky .track{height:18px}
-.panel.sticky .hint,.panel.sticky .meta small,.panel.sticky .plays{display:none}
-.panel.sticky .play{width:44px;height:44px}
-.panel.sticky .play svg{width:18px;height:18px}
-.panel.sticky .meta strong{font-size:16px}
-.panel.sticky{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 16px}
-.panel.sticky .player-row{flex:1 1 260px}
-.panel.sticky .controls{flex:2 1 320px;gap:10px}
-.panel.sticky .track{flex:1 1 100%;order:3}
-.panel.sticky .ctl .label{display:none}
-.panel.sticky #toggleScript{order:2}
-@media (max-width:640px){.panel.sticky .controls>.ctl{display:none}.panel.sticky .controls{gap:6px}.panel.sticky .player-row{grid-template-columns:auto minmax(0,1fr)}}
+.panel.sticky .track{height:14px}
+.panel.sticky .hint,.panel.sticky .meta small{display:none}
+.panel.sticky .play{width:42px;height:42px}
+.panel.sticky .play svg{width:17px;height:17px}
+.panel.sticky .meta strong{font-size:16px;white-space:nowrap}
+.panel.sticky .plays{display:none}
+@media (max-width:640px){.panel.sticky .controls>.ctl:nth-child(-n+2){display:none}.panel.sticky .controls{gap:6px 14px}.panel.sticky .meta{display:none}.panel.sticky #restart{display:none}.panel.sticky .loopbar .label{display:none}.panel.sticky .seg-toggle button{padding:5px 8px}}
 .ready{display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px dashed var(--line);border-radius:var(--r);background:var(--surface-2);cursor:pointer;user-select:none;transition:background .2s,border-color .2s}
 .ready input{width:28px;height:28px;accent-color:var(--good);flex:none;cursor:inherit}
 .ready b{font:800 17px/1.2 var(--f-display)}
@@ -584,29 +575,27 @@ header.top .passages{display:none}
     <div class="player-row">
       <button class="play" id="playBtn" aria-label="Phát"><svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></button>
       <div class="meta"><span class="label" id="plLevel">B1</span><strong id="pl-h">Bài nghe</strong><small id="plInfo"></small></div>
+      <div class="track" id="track" aria-label="Tiến trình theo câu"></div>
       <div class="plays"><span>Đã nghe</span><div class="dots" id="dots"></div><span id="playsN" style="font-family:var(--f-mono)">0</span></div>
+      <button class="btn" id="restart">Nghe lại từ đầu</button>
+      <button class="btn" id="toggleScript" hidden>Xem script</button>
     </div>
-    <div class="track" id="track" aria-label="Tiến trình theo câu"></div>
     <div class="controls">
       <div class="ctl"><span class="label">Tốc độ</span>
         <div class="seg-toggle" id="rates"><button data-r="0.75">0.75×</button><button data-r="0.9" aria-pressed="true">0.9×</button><button data-r="1">1×</button><button data-r="1.15">1.15×</button></div>
       </div>
       <div class="ctl"><span class="label">Giọng</span><select id="voice" aria-label="Chọn giọng đọc"></select></div>
-      <button class="btn" id="restart">Nghe lại từ đầu</button>
-      <button class="btn" id="toggleScript" hidden>Xem script</button>
-    </div>
-    <div class="runs"><span class="label">Số lượt nghe</span><input type="range" id="runs" min="1" max="5" step="1" value="3" aria-label="Số lượt nghe"><output id="runsN" for="runs">3</output><span class="count" id="runsMax"></span></div>
-    <div class="loopbar" id="loopBar">
-      <div class="dtgrp" id="lpCountGrp"><span class="label">Lặp</span>
-        <div class="seg-toggle" id="lpN"><button data-v="1">×1</button><button data-v="2">×2</button><button data-v="3">×3</button><button data-v="5">×5</button></div>
-        <label class="dtcus">khác <input type="number" id="lpC" min="1" max="20" inputmode="numeric" aria-label="Số lần lặp tuỳ chỉnh"></label>
-      </div>
-      <div class="dtgrp"><span class="label">Nghỉ giữa các lần</span>
-        <div class="seg-toggle" id="lpG"><button data-v="0">+0s</button><button data-v="3">+3s</button><button data-v="5">+5s</button><button data-v="10">+10s</button></div>
-        <label class="dtcus">khác <input type="number" id="lpGC" min="0" max="120" inputmode="numeric" aria-label="Số giây nghỉ tuỳ chỉnh"><span>s</span></label>
+      <div class="loopbar" id="loopBar">
+        <div class="ctl" id="lpCountGrp"><span class="label">Lặp</span>
+          <div class="seg-toggle" id="lpN"><button data-v="1">×1</button><button data-v="2">×2</button><button data-v="3">×3</button><button data-v="5">×5</button></div>
+        </div>
+        <div class="ctl"><span class="label">Nghỉ</span>
+          <div class="seg-toggle" id="lpG"><button data-v="0">+0s</button><button data-v="3">+3s</button><button data-v="5">+5s</button><button data-v="10">+10s</button></div>
+        </div>
       </div>
       <span class="count loopinfo" id="loopInfo" aria-live="polite"></span>
     </div>
+    <div class="runs"><span class="label">Số lượt nghe</span><input type="range" id="runs" min="1" max="5" step="1" value="3" aria-label="Số lượt nghe"><output id="runsN" for="runs">3</output><span class="count" id="runsMax"></span></div>
     <p class="hint" id="hint"></p>
     <label class="ready lock" id="readyRow"><input type="checkbox" id="chkR" disabled><span><b>I am ready</b><small id="readyNote"></small></span></label>
   </section>
@@ -737,11 +726,9 @@ header.top .passages{display:none}
         <div class="dtrep" id="dtRep">
           <div class="dtgrp"><span class="dtgl">Lặp câu</span>
             <div class="seg-toggle dark" id="dtRepN"><button data-v="1">×1</button><button data-v="2">×2</button><button data-v="3">×3</button><button data-v="5">×5</button></div>
-            <label class="dtcus">khác <input type="number" id="dtRepC" min="1" max="20" inputmode="numeric" aria-label="Số lần lặp tuỳ chỉnh"></label>
           </div>
           <div class="dtgrp"><span class="dtgl">Chờ giữa các lần</span>
             <div class="seg-toggle dark" id="dtGapN"><button data-v="0">+0s</button><button data-v="5">+5s</button><button data-v="10">+10s</button><button data-v="15">+15s</button></div>
-            <label class="dtcus">khác <input type="number" id="dtGapC" min="0" max="120" inputmode="numeric" aria-label="Số giây chờ tuỳ chỉnh"><span>s</span></label>
           </div>
         </div>
         <div class="dtlabel" id="dtLabel"></div>
@@ -1121,17 +1108,14 @@ function completeRound(){
 
 /* loop settings for the whole-passage player */
 function loopUI(){
-  const sync=(grp,inp,val)=>{ let hit=false; $(grp).querySelectorAll("button").forEach(b=>{ const on=+b.dataset.v===val; b.setAttribute("aria-pressed",on); if(on) hit=true; }); $(inp).classList.toggle("on",!hit); $(inp).value=hit?"":val; };
-  sync("lpN","lpC",S.runsC); sync("lpG","lpGC",S.gapRun);
+  const sync=(grp,val)=>$(grp).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===val));
+  sync("lpN",S.runsC); sync("lpG",S.gapRun);
 }
 function loopSave(){ store.set("dg2-loop",{runsC:S.runsC,gap:S.gapRun}); }
 function setRunsC(v){ S.runsC=v; if(S.app==="dg"&&S.step===2){ S.runs=v; renderDots(); } loopSave(); }
 $("lpN").querySelectorAll("button").forEach(b=>b.onclick=()=>{ setRunsC(+b.dataset.v); loopUI(); });
 $("lpG").querySelectorAll("button").forEach(b=>b.onclick=()=>{ S.gapRun=+b.dataset.v; loopSave(); loopUI(); });
-$("lpC").oninput=e=>{ const v=Math.max(1,Math.min(20,Math.round(+e.target.value))); if(e.target.value!==""&&isFinite(v)){ setRunsC(v); $("lpN").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===v)); e.target.classList.toggle("on",![1,2,3,5].includes(v)); } };
-$("lpGC").oninput=e=>{ const v=Math.max(0,Math.min(120,Math.round(+e.target.value))); if(e.target.value!==""&&isFinite(v)){ S.gapRun=v; loopSave(); $("lpG").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===v)); e.target.classList.toggle("on",![0,3,5,10].includes(v)); } };
-$("lpC").onblur=$("lpGC").onblur=loopUI;
-{ const sv=store.get("dg2-loop")||{}; S.runsC=Math.max(1,Math.min(20,+sv.runsC||1)); S.gapRun=Math.max(0,Math.min(120,sv.gap==null?3:+sv.gap)); }
+{ const sv=store.get("dg2-loop")||{}; const sn=(v,l)=>l.reduce((a,b)=>Math.abs(b-v)<Math.abs(a-v)?b:a); S.runsC=sn(+sv.runsC||1,[1,2,3,5]); S.gapRun=sn(sv.gap==null?3:+sv.gap,[0,3,5,10]); }
 
 /* ================= board model ================= */
 const board=$("board");
@@ -1697,16 +1681,13 @@ function dtSpeak(){
 $("dtPlay").onclick=dtSpeak;
 $("dtRates").querySelectorAll("button").forEach(b=>b.onclick=()=>{ DT.rate=+b.dataset.r; $("dtRates").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); });
 function dtRepUI(){
-  const sync=(grp,inp,val,presets)=>{ let hit=false; $(grp).querySelectorAll("button").forEach(b=>{ const on=+b.dataset.v===val&&presets; b.setAttribute("aria-pressed",on); if(on) hit=true; }); $(inp).classList.toggle("on",!hit); if(!hit) $(inp).value=val; else $(inp).value=""; };
-  sync("dtRepN","dtRepC",DT.rep,true); sync("dtGapN","dtGapC",DT.gap,true);
+  const sync=(grp,val)=>$(grp).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===val));
+  sync("dtRepN",DT.rep); sync("dtGapN",DT.gap);
 }
 function dtRepSave(){ store.set("dg2-dt-rep",{rep:DT.rep,gap:DT.gap}); }
 $("dtRepN").querySelectorAll("button").forEach(b=>b.onclick=()=>{ DT.rep=+b.dataset.v; dtRepUI(); dtRepSave(); });
 $("dtGapN").querySelectorAll("button").forEach(b=>b.onclick=()=>{ DT.gap=+b.dataset.v; dtRepUI(); dtRepSave(); });
-$("dtRepC").oninput=e=>{ const v=Math.max(1,Math.min(20,Math.round(+e.target.value))); if(e.target.value!==""&&isFinite(v)){ DT.rep=v; dtRepSave(); $("dtRepN").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===v)); e.target.classList.toggle("on",![1,2,3,5].includes(v)); } };
-$("dtGapC").oninput=e=>{ const v=Math.max(0,Math.min(120,Math.round(+e.target.value))); if(e.target.value!==""&&isFinite(v)){ DT.gap=v; dtRepSave(); $("dtGapN").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===v)); e.target.classList.toggle("on",![0,5,10,15].includes(v)); } };
-$("dtRepC").onblur=$("dtGapC").onblur=dtRepUI;
-{ const sv=store.get("dg2-dt-rep")||{}; DT.rep=Math.max(1,Math.min(20,+sv.rep||1)); DT.gap=Math.max(0,Math.min(120,sv.gap==null?5:+sv.gap)); dtRepUI(); }
+{ const sv=store.get("dg2-dt-rep")||{}; const sn=(v,l)=>l.reduce((a,b)=>Math.abs(b-v)<Math.abs(a-v)?b:a); DT.rep=sn(+sv.rep||1,[1,2,3,5]); DT.gap=sn(sv.gap==null?5:+sv.gap,[0,5,10,15]); dtRepUI(); }
 $("dtSound").onchange=e=>{ $("optSound").checked=e.target.checked; };
 $("optSound").addEventListener("change",e=>{ $("dtSound").checked=e.target.checked; });
 function dtFx(text,color){
