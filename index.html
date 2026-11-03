@@ -808,11 +808,11 @@ const DEFAULT_CONNS=["then","because","so","but","and","than","as a result","for
 const STOP=new Set("a an the and or but so of to in on at for with by from as is are was were be been being it its this that these those there their they them he she his her we our you your i my me us do does did have has had not no can could will would should may might must than then also very just into about over after before during because while which who whom what when where why how all any some more most such only own same each few both other many much every".split(" "));
 
 const SKINS={
- space:{name:"Chòm sao",dot:"radial-gradient(circle at 35% 35%,#FFD678,#2A2F6E 70%)",bank:"TÚI SAO",board:"BẦU TRỜI · thả sao tự do, kéo sát nhau để nối thành chòm",empty:"Hái sao từ túi thả lên bầu trời.<br>Kéo sao sát bên trái hoặc bên phải sao khác để nối.",head:"#5BC0FF",ink:"#0B1029",hat:"helmet",vertical:false,ret:"↩ Thả vào đây để cất sao"},
+ space:{name:"Chòm sao",dot:"radial-gradient(circle at 35% 35%,#FFD678,#2A2F6E 70%)",bank:"TÚI SAO",board:"BẦU TRỜI · thả sao tự do, kéo sát nhau để nối thành chòm",empty:"Hái sao từ túi thả lên bầu trời.<br>Kéo sao sát bên trái hoặc bên phải sao khác để nối.",head:"#5BC0FF",ink:"#0B1029",hat:"helmet",vertical:true,ret:"↩ Thả vào đây để cất sao"},
  lego:{name:"Lego",dot:"conic-gradient(#E3342F 0 25%,#F5C400 0 50%,#1A8CFF 0 75%,#2DB34A 0)",bank:"THÙNG GẠCH",board:"TẤM ĐẾ · ráp sát trái/phải, hoặc chồng gạch lên nhau",empty:"Lấy gạch trong thùng đặt lên tấm đế.<br>Ráp sát trái/phải, hoặc chồng lên trên viên khác để nối.",head:"#F5C400",ink:"#1F2430",hat:"hardhat",vertical:true,ret:"↩ Thả vào đây để cất gạch"},
- music:{name:"Khuông nhạc",dot:"radial-gradient(circle at 40% 40%,#FF6F61 45%,#22264A 47%)",bank:"HỘP NỐT NHẠC",board:"TỜ NHẠC · đặt nốt tự do, sát nhau thành câu nhạc",empty:"Lấy nốt từ hộp đặt lên tờ nhạc.<br>Đặt sát bên trái hoặc bên phải nốt khác để nối thành câu nhạc.",head:"#FF6F61",ink:"#22264A",hat:"bow",vertical:false,ret:"↩ Thả vào đây để cất nốt"},
- ocean:{name:"Đại dương",dot:"linear-gradient(180deg,#2C9CD6,#0C4B7E)",bank:"LƯỚI CÁ · TÔM",board:"LÒNG BIỂN · thả cá, tôm tự do, bơi sát nhau là thành đàn",empty:"Thả cá và tôm từ lưới xuống biển.<br>Cho chúng bơi sát bên trái hoặc bên phải nhau để nối thành đàn.",head:"#FFB04C",ink:"#0B2D4A",hat:"snorkel",vertical:false,ret:"↩ Thả vào đây để cho về lưới"},
- cloud:{name:"Mây cầu vồng",dot:"linear-gradient(135deg,#FF7A9A,#FFD666,#6FD3A8,#9FC7FF)",bank:"TÚI MÂY",board:"BẦU TRỜI · thả mây tự do, sát nhau là cầu vồng hiện ra",empty:"Thả mây từ túi lên bầu trời.<br>Kéo mây sát bên trái hoặc bên phải mây khác để bắc cầu vồng.",head:"#FF7A9A",ink:"#3B3F78",hat:"rainbow",vertical:false,ret:"↩ Thả vào đây để cất mây"}
+ music:{name:"Khuông nhạc",dot:"radial-gradient(circle at 40% 40%,#FF6F61 45%,#22264A 47%)",bank:"HỘP NỐT NHẠC",board:"TỜ NHẠC · đặt nốt tự do, sát nhau thành câu nhạc",empty:"Lấy nốt từ hộp đặt lên tờ nhạc.<br>Đặt sát bên trái hoặc bên phải nốt khác để nối thành câu nhạc.",head:"#FF6F61",ink:"#22264A",hat:"bow",vertical:true,ret:"↩ Thả vào đây để cất nốt"},
+ ocean:{name:"Đại dương",dot:"linear-gradient(180deg,#2C9CD6,#0C4B7E)",bank:"LƯỚI CÁ · TÔM",board:"LÒNG BIỂN · thả cá, tôm tự do, bơi sát nhau là thành đàn",empty:"Thả cá và tôm từ lưới xuống biển.<br>Cho chúng bơi sát bên trái hoặc bên phải nhau để nối thành đàn.",head:"#FFB04C",ink:"#0B2D4A",hat:"snorkel",vertical:true,ret:"↩ Thả vào đây để cho về lưới"},
+ cloud:{name:"Mây cầu vồng",dot:"linear-gradient(135deg,#FF7A9A,#FFD666,#6FD3A8,#9FC7FF)",bank:"TÚI MÂY",board:"BẦU TRỜI · thả mây tự do, sát nhau là cầu vồng hiện ra",empty:"Thả mây từ túi lên bầu trời.<br>Kéo mây sát bên trái hoặc bên phải mây khác để bắc cầu vồng.",head:"#FF7A9A",ink:"#3B3F78",hat:"rainbow",vertical:true,ret:"↩ Thả vào đây để cất mây"}
 };
 const LEGO_COLORS=["#F5C400","#5AB4FF","#59C36A","#FF9F40","#FF7B7B","#C9A6FF"];
 const NOTE_COLORS=["#FF6F61","#4FC3F7","#FFC93C","#7ED957","#B388FF"];
@@ -850,7 +850,7 @@ function loadPassage(p){
   const saved=store.get("dg2-"+p.id)||{};
   $("freeNotes").value=saved.free||""; $("recon").value=saved.recon||"";
   const valid=new Set(allWords());
-  S.chains=(saved.chains||[]).map(c=>({id:S.uid++,x:+c.x||20,y:+c.y||40,items:(c.items||[]).filter(it=>valid.has(it.w)).map((it,i)=>({w:it.w,dir:i?(it.dir==="u"?"u":"r"):"",conn:it.conn||""}))})).filter(c=>c.items.length);
+  S.chains=(saved.chains||[]).map(c=>({id:S.uid++,x:+c.x||20,y:+c.y||40,items:(c.items||[]).filter(it=>valid.has(it.w)).map((it,i)=>({w:it.w,dir:i?(DIRV[it.dir]?it.dir:"r"):"",conn:it.conn||""}))})).filter(c=>c.items.length);
   S.bankOrder=shuffle(allWords());
   S.combo=0; S.xp=saved.xp||0; S.links=0;
   const pref=store.get("dg2-skin");
@@ -1135,7 +1135,18 @@ $("lpC").onblur=$("lpGC").onblur=loopUI;
 
 /* ================= board model ================= */
 const board=$("board");
-const GAP=32, SNAP=34;
+const GAP=32, SNAP=34, VG=6, DG=14;
+/* 8 hướng nối: r l u d + 4 chéo (hướng từ thẻ trước → thẻ sau) */
+const DIRV={r:[1,0],l:[-1,0],u:[0,-1],d:[0,1],ur:[1,-1],ul:[-1,-1],dr:[1,1],dl:[-1,1]};
+const DIRS=Object.keys(DIRV);
+const DIRNAME={r:"→",l:"←",u:"↑",d:"↓",ur:"↗",ul:"↖",dr:"↘",dl:"↙"};
+function placeRel(p,dir,w,h){ // rect of a card of size w×h linked from rect p in direction dir
+  const [sx,sy]=DIRV[dir]||DIRV.r;
+  const x=sx>0?p.x+p.w+GAP:sx<0?p.x-GAP-w:p.x;
+  const gy=sx?DG:VG;
+  const y=sy>0?p.y+p.h+gy:sy<0?p.y-h-gy:p.y+(p.h-h)/2;
+  return {x,y,w,h};
+}
 const elOf=new Map(); // "cid:i" -> element
 function measure(c){
   c.items.forEach((it,i)=>{ const el=elOf.get(c.id+":"+i); if(el){ it._w=el.offsetWidth; it._h=el.offsetHeight; } else { it._w=it._w||110; it._h=it._h||30; } });
@@ -1146,8 +1157,7 @@ function rects(c){
     const w=it._w||110, h=it._h||30;
     if(i===0){ out.push({x,y,w,h}); return; }
     const p=out[i-1];
-    if(it.dir==="u") out.push({x:p.x, y:p.y-h-6, w, h});
-    else out.push({x:p.x+p.w+GAP, y:p.y+(p.h-h)/2, w, h});
+    out.push(placeRel(p,it.dir,w,h));
   });
   return out;
 }
@@ -1203,9 +1213,15 @@ function arrowPath(p,q,vertical){
   return `<line x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}" stroke="${col}" stroke-width="2.4"/>${head}`;
 }
 function linkPts(a,b,dir){
-  if(dir==="u") return {p:{x:a.x-10,y:a.y+a.h-4},q:{x:b.x-10,y:b.y+6},v:true};
-  const pad=S.skin==="ocean"?16:4;
-  return {p:{x:a.x+a.w+3,y:a.y+a.h/2},q:{x:b.x-pad,y:b.y+b.h/2},v:false};
+  const [sx,sy]=DIRV[dir]||DIRV.r;
+  if(sx&&!sy){
+    const pad=S.skin==="ocean"?16:4;
+    return sx>0?{p:{x:a.x+a.w+3,y:a.y+a.h/2},q:{x:b.x-pad,y:b.y+b.h/2},v:false}
+               :{p:{x:a.x-3,y:a.y+a.h/2},q:{x:b.x+b.w+pad,y:b.y+b.h/2},v:false};
+  }
+  if(!sx) return sy<0?{p:{x:a.x-10,y:a.y+a.h-4},q:{x:b.x-10,y:b.y+6},v:true}
+                      :{p:{x:a.x-10,y:a.y+4},q:{x:b.x-10,y:b.y+b.h-6},v:true};
+  return {p:{x:sx>0?a.x+a.w:a.x,y:sy>0?a.y+a.h:a.y},q:{x:sx>0?b.x:b.x+b.w,y:sy>0?b.y:b.y+b.h},v:true};
 }
 let preview=null;
 function drawArrows(){
@@ -1335,15 +1351,14 @@ function onMove(e){
   if(D.snap&&D.snap.kind==="ins"){
     const t=D.snap.target, i=D.snap.at, tr=rects(t);
     [i-1,i].forEach(k=>{ const el=elOf.get(t.id+":"+k); if(el) el.classList.add("mag"); });
-    preview=linkPts(tr[i-1],tr[i],t.items[i].dir==="u"?"u":"r");
+    preview=linkPts(tr[i-1],tr[i],t.items[i].dir);
   } else if(D.snap){
-    const t=D.snap.target, ti=D.snap.kind.startsWith("app")?t.items.length-1:0;
+    const t=D.snap.target, ti=D.snap.kind==="app"?t.items.length-1:0;
     const tel=elOf.get(t.id+":"+ti); if(tel) tel.classList.add("mag");
     const tr=rects(t)[ti], dr=rects(c);
-    if(D.snap.kind==="appR") preview=linkPts(tr,dr[0],"r");
-    if(D.snap.kind==="preL") preview=linkPts(dr[dr.length-1],tr,"r");
-    if(D.snap.kind==="appU") preview=linkPts(tr,dr[0],"u");
-    if(D.snap.kind==="preD") preview=linkPts(dr[dr.length-1],tr,"u");
+    const sd=D.snap.dir;
+    if(D.snap.kind==="app") preview=linkPts(tr,dr[0],sd);
+    if(D.snap.kind==="pre") preview=linkPts(dr[dr.length-1],tr,sd);
   }
   const overBank=overEl($("bank").parentElement,e), overRet=overEl($("ret"),e);
   $("bank").classList.toggle("hot",overBank); $("ret").classList.toggle("hot",overRet);
@@ -1351,31 +1366,26 @@ function onMove(e){
 }
 function findSnap(c){
   const dr=rects(c), dh=dr[0], dt=dr[dr.length-1];
-  const vert=SKINS[S.skin].vertical;
   let best=null;
-  const consider=(kind,target,d,at)=>{ if(d<SNAP&&(!best||d<best.d)) best={kind,target,d,at}; };
+  const consider=(kind,target,d,at,dir)=>{ if(d<SNAP&&(!best||d<best.d)) best={kind,target,d,at,dir}; };
   S.chains.forEach(t=>{
     if(t===c) return;
     const tr=rects(t), th=tr[0], tt=tr[tr.length-1];
     // dragged card dropped onto a link in the middle of a chain -> insert there
     for(let i=1;i<t.items.length;i++){
-      const pv=tr[i-1], cu=tr[i], up=t.items[i].dir==="u";
-      const mx=up?pv.x+pv.w/2:pv.x+pv.w+GAP/2, my=up?pv.y-3:pv.y+pv.h/2;
+      const pv=tr[i-1], L=linkPts(pv,tr[i],t.items[i].dir);
+      const mx=(L.p.x+L.q.x)/2, my=(L.p.y+L.q.y)/2;
+      const vt=!!DIRV[t.items[i].dir][0]===false;
       const ex=Math.abs(dh.x+dh.w/2-mx), ey=Math.abs(dh.y+dh.h/2-my);
-      if(ex<(up?44:30)&&ey<(up?20:24)) consider("ins",t,(ex+ey)*.55,i);
+      if(ex<(vt?44:30)&&ey<(vt?24:26)) consider("ins",t,(ex+ey)*.55,i);
     }
-    // dragged head to the right of target tail
-    let dx=Math.abs(dh.x-(tt.x+tt.w+GAP)), dy=Math.abs((dh.y+dh.h/2)-(tt.y+tt.h/2));
-    if(dy<26) consider("appR",t,dx+dy*.5);
-    // dragged tail to the left of target head
-    dx=Math.abs((dt.x+dt.w+GAP)-th.x); dy=Math.abs((dt.y+dt.h/2)-(th.y+th.h/2));
-    if(dy<26) consider("preL",t,dx+dy*.5);
-    if(vert){
-      dx=Math.abs(dh.x-tt.x); dy=Math.abs((dh.y+dh.h+6)-tt.y);
-      if(dx<40) consider("appU",t,dy+dx*.4);
-      dx=Math.abs(th.x-dt.x); dy=Math.abs((th.y+th.h+6)-dt.y);
-      if(dx<40) consider("preD",t,dy+dx*.4);
-    }
+    // 8 directions: dragged head after target tail / dragged tail before target head
+    DIRS.forEach(k=>{
+      const e=placeRel(tt,k,dh.w,dh.h);
+      consider("app",t,Math.hypot(dh.x-e.x,dh.y-e.y)*.9,0,k);
+      const f=placeRel(dt,k,th.w,th.h);
+      consider("pre",t,Math.hypot(th.x-f.x,th.y-f.y)*.9,0,k);
+    });
   });
   return best;
 }
@@ -1391,20 +1401,20 @@ function onUp(e){
     const t=d.snap.target, k=d.snap.kind;
     let a,b;
     if(k==="ins"){
-      const i=d.snap.at, prev=t.items[i-1], next=t.items[i], dir=next.dir==="u"?"u":"r";
+      const i=d.snap.at, prev=t.items[i-1], next=t.items[i], dir=next.dir;
       c.items[0].dir=dir; c.items[0].conn=""; next.dir=dir; next.conn="";
       t.items.splice(i,0,...c.items); S.chains=S.chains.filter(x=>x!==c);
       c.items[0]._pop=true; clampLater(t);
       onLink(prev.w,c.items[0].w);
       if(c.items.length>0) onLink(c.items[c.items.length-1].w,next.w);
-    } else if(k==="appR"||k==="appU"){
+    } else if(k==="app"){
       a=t.items[t.items.length-1]; b=c.items[0];
-      c.items[0].dir=k==="appU"?"u":"r"; c.items[0].conn="";
+      c.items[0].dir=d.snap.dir; c.items[0].conn="";
       t.items=t.items.concat(c.items); S.chains=S.chains.filter(x=>x!==c);
       b._pop=true; clampLater(t);
     } else {
       a=c.items[c.items.length-1]; b=t.items[0];
-      t.items[0].dir=k==="preD"?"u":"r"; t.items[0].conn="";
+      t.items[0].dir=d.snap.dir; t.items[0].conn="";
       c.items=c.items.concat(t.items); S.chains=S.chains.filter(x=>x!==t);
       a._pop=true; clampLater(c);
     }
