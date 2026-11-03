@@ -1472,26 +1472,32 @@ window.addEventListener("resize",()=>{ if(S.mode==="bank") renderBoard(); });
 function updateWC(){ const n=words($("recon").value).length; $("wc").textContent=`${n} từ / bài gốc ${words(S.p.text).length} từ`; }
 $("recon").addEventListener("input",()=>{ updateWC(); if(S.stage<2&&$("recon").value.trim()) setStage(2); saveState(); });
 $("freeNotes").addEventListener("input",saveState);
-/* Tab = chèn mũi tên khi ghi chú nhanh (Esc rồi Tab, hoặc Shift+Tab, để rời ô) */
+/* Tab = chèn mũi tên khi ghi chú nhanh (Esc rồi Tab, hoặc Shift+Tab, để rời ô).
+   Với bộ gõ tiếng Việt: chờ bộ gõ chốt chữ xong (compositionend) rồi mới chèn, để không bị nhân đôi từ. */
 (function(){
-  const ta=$("freeNotes"); let esc=false;
+  const ta=$("freeNotes"); let esc=false, comp=false, pending=false, tm=0;
   const insert=()=>{
+    pending=false; clearTimeout(tm);
     const v=ta.value, a=ta.selectionStart, b=ta.selectionEnd;
     const pre=a>0&&!/\s/.test(v[a-1])?" ":"";
     ta.setRangeText(pre+"→ ",a,b,"end");
     ta.dispatchEvent(new Event("input",{bubbles:true}));
   };
-  ta.addEventListener("blur",()=>{ esc=false; });
+  ta.addEventListener("compositionstart",()=>{ comp=true; });
+  ta.addEventListener("compositionend",()=>{ comp=false; if(pending) setTimeout(insert,0); });
+  ta.addEventListener("blur",()=>{ esc=false; pending=false; comp=false; });
   ta.addEventListener("keydown",e=>{
     if(e.key==="Escape"){ esc=true; return; }
-    if(e.key!=="Tab"&&e.key!=="Shift"&&e.key!=="Process"&&e.code!=="Tab") esc=false;
-    const isTab=e.key==="Tab"||e.code==="Tab"||(e.keyCode===9);
-    const composing=e.isComposing||e.keyCode===229;
-    if(!isTab&&!(composing&&e.code==="Tab")) return;
+    const isTab=e.key==="Tab"||e.code==="Tab"||e.keyCode===9;
+    if(!isTab){ if(e.key!=="Shift"&&e.key!=="Process") esc=false; return; }
     if(e.shiftKey||e.ctrlKey||e.altKey||e.metaKey) return;
     if(esc){ esc=false; return; }
     e.preventDefault();
-    if(composing){ setTimeout(insert,30); return; } // bộ gõ tiếng Việt đang chờ chốt chữ
+    if(comp||e.isComposing||e.keyCode===229){
+      pending=true; clearTimeout(tm);
+      tm=setTimeout(()=>{ if(pending&&!comp) insert(); },250); // bộ gõ không gửi compositionend thì tự chèn sau 250ms
+      return;
+    }
     insert();
   });
 })();
