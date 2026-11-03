@@ -1476,9 +1476,12 @@ $("freeNotes").addEventListener("input",saveState);
    Với bộ gõ tiếng Việt: chờ bộ gõ chốt chữ xong (compositionend) rồi mới chèn, để không bị nhân đôi từ. */
 (function(){
   const ta=$("freeNotes"); let esc=false, comp=false, pending=false, tm=0;
+  let last=0;
   const insert=()=>{
     pending=false; clearTimeout(tm);
+    const now=Date.now(); if(now-last<120) return; last=now; // chống chèn đôi khi bộ gõ gửi nhiều sự kiện
     const v=ta.value, a=ta.selectionStart, b=ta.selectionEnd;
+    if(a===b&&/→\s?$/.test(v.slice(Math.max(0,a-3),a))) return;
     const pre=a>0&&!/\s/.test(v[a-1])?" ":"";
     ta.setRangeText(pre+"→ ",a,b,"end");
     ta.dispatchEvent(new Event("input",{bubbles:true}));
