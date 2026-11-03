@@ -774,7 +774,7 @@ header.top .passages{display:none}
       </div>
       <label>Đoạn văn để đọc<textarea id="tText" placeholder="Dán đoạn văn tiếng Anh, 3–6 câu là vừa."></textarea></label>
       <div class="pickbox" id="tPickBox">
-        <div class="pickhead"><div class="label">Bấm vào từ để chọn làm từ khoá</div>
+        <div class="pickhead"><div class="label">Bấm vào từ hoặc con số để chọn làm từ khoá</div>
           <label class="tog"><input type="checkbox" id="tMerge" checked> Gộp các từ liền nhau thành cụm</label>
           <button class="btn sm" id="tPickClear" type="button">Bỏ chọn hết</button>
           <span class="count" id="tPickN"></span></div>
@@ -1819,7 +1819,7 @@ function dtReward(){
 /* ================= teacher ================= */
 const lines=v=>v.split(/\n|;/).map(x=>x.trim()).filter(Boolean);
 $("tSkin").innerHTML=Object.entries(SKINS).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join("");
-function suggestKeys(t){ const seen=new Set(), out=[]; (t.match(/[A-Za-z][A-Za-z'’-]*/g)||[]).forEach(w=>{ const l=w.toLowerCase(); if(l.length>3&&!STOP.has(l)&&!seen.has(l)){ seen.add(l); out.push(w); } }); return out.slice(0,20); }
+function suggestKeys(t){ t=t.replace(/(^|\n)[ \t]*[A-Z][A-Z ]{1,20}:/g,"$1"); const seen=new Set(), out=[]; (t.match(/\d+(?:[.,:]\d+)*[A-Za-z]*%?|[A-Za-z][A-Za-z'’-]*/g)||[]).forEach(w=>{ const l=w.toLowerCase(); if(((l.length>3&&!STOP.has(l))||/^\d/.test(l))&&!seen.has(l)){ seen.add(l); out.push(w); } }); return out.slice(0,20); }
 function renderPreview(){ renderPick(); renderPreview0(); }
 function renderPreview0(){
   const t=$("tText").value.toLowerCase(), ks=lines($("tKeys").value), nz=lines($("tNoise").value), cs=lines($("tConns").value);
@@ -1837,10 +1837,10 @@ function renderPick(){
   const text=$("tText").value, box=$("tPick");
   if(!text.trim()){ pickToks=[]; pickGrp=[]; box.innerHTML="<em>Dán đoạn văn ở trên, các từ sẽ hiện ở đây để bạn bấm chọn.</em>"; $("tPickN").textContent=""; return; }
   // tokens: words and the text between them
-  pickToks=[]; let last=0, m; const re=/[A-Za-z][A-Za-z'’-]*/g;
+  pickToks=[]; let last=0, m; const re=/\d+(?:[.,:]\d+)*[A-Za-z]*%?|[A-Za-z][A-Za-z'’-]*/g;
   while((m=re.exec(text))){
     const gap=text.slice(last,m.index), end=m.index+m[0].length;
-    const spk=m[0].length>=2&&m[0]===m[0].toUpperCase()&&(pickToks.length===0?!text.slice(0,m.index).trim():/\n/.test(gap))&&/^\s*:/.test(text.slice(end));
+    const spk=/^[A-Za-z]/.test(m[0])&&m[0].length>=2&&m[0]===m[0].toUpperCase()&&(pickToks.length===0?!text.slice(0,m.index).trim():/\n/.test(gap))&&/^\s*:/.test(text.slice(end));
     pickToks.push({w:m[0],gap,spk}); last=end;
   }
   const tail=text.slice(last);
@@ -1849,7 +1849,7 @@ function renderPick(){
   const norm=w=>w.toLowerCase().replace(/[’]/g,"'");
   let cursor=0;
   lines($("tKeys").value).forEach((k,ki)=>{
-    const kw=(k.match(/[A-Za-z][A-Za-z'’-]*/g)||[]).map(norm); if(!kw.length){ pickExtra.push(k); return; }
+    const kw=(k.match(/\d+(?:[.,:]\d+)*[A-Za-z]*%?|[A-Za-z][A-Za-z'’-]*/g)||[]).map(norm); if(!kw.length){ pickExtra.push(k); return; }
     const find=(from)=>{ for(let i=from;i+kw.length<=pickToks.length;i++){ let ok=true; for(let j=0;j<kw.length;j++){ if(pickToks[i+j].spk||norm(pickToks[i+j].w)!==kw[j]||pickGrp[i+j]){ ok=false; break; } } if(ok) return i; } return -1; };
     let at=find(cursor); if(at<0) at=find(0);
     if(at<0){ pickExtra.push(k); return; }
