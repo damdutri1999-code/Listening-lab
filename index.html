@@ -261,7 +261,9 @@ body{font-weight:500}
 :root[data-skin="lego"] h1,:root[data-skin="lego"] h2{font-weight:800;letter-spacing:-.02em}
 :root[data-skin="space"] h1,:root[data-skin="space"] h2{letter-spacing:.01em;font-weight:700}
 :root[data-skin="space"] .label,:root[data-skin="space"] .count{letter-spacing:.06em}
-:root[data-skin="lego"] .tk,:root[data-skin="cloud"] .tk,:root[data-skin="ocean"] .tk,:root[data-skin="music"] .tk{font-size:13.5px}
+:root[data-skin] .tk{font-size:16px;line-height:1.25}
+:root[data-skin] .bank{gap:11px 10px}
+@media (max-width:640px){:root[data-skin] .tk{font-size:15px}}
 
 /* ===== lesson picker page ===== */
 #wrap[data-screen="lessons"]>:not(#lessons){display:none!important}
@@ -301,8 +303,20 @@ header.top .passages{display:none}
 .script .sent.now{background:var(--signal-soft);box-shadow:0 0 0 2px var(--signal)}
 .script .w{cursor:pointer;border-radius:4px;padding:0 1px}
 .script .w:hover,.script .w:focus-visible{background:var(--surface-2);text-decoration:underline dotted;text-underline-offset:4px}
-.panel.sticky{position:sticky;top:8px;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.22);padding:12px 16px;gap:10px}
-.panel.sticky .track{height:22px}
+#flowView{display:contents}
+.panel.sticky{position:sticky;top:8px;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.28);padding:10px 14px;gap:8px}
+.panel.sticky .track{height:18px}
+.panel.sticky .hint,.panel.sticky .meta small,.panel.sticky .plays{display:none}
+.panel.sticky .play{width:44px;height:44px}
+.panel.sticky .play svg{width:18px;height:18px}
+.panel.sticky .meta strong{font-size:16px}
+.panel.sticky{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 16px}
+.panel.sticky .player-row{flex:1 1 260px}
+.panel.sticky .controls{flex:2 1 320px;gap:10px}
+.panel.sticky .track{flex:1 1 100%;order:3}
+.panel.sticky .ctl .label{display:none}
+.panel.sticky #toggleScript{order:2}
+@media (max-width:640px){.panel.sticky .controls>.ctl{display:none}.panel.sticky .controls{gap:6px}.panel.sticky .player-row{grid-template-columns:auto minmax(0,1fr)}}
 .ready{display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px dashed var(--line);border-radius:var(--r);background:var(--surface-2);cursor:pointer;user-select:none;transition:background .2s,border-color .2s}
 .ready input{width:28px;height:28px;accent-color:var(--good);flex:none;cursor:inherit}
 .ready b{font:800 17px/1.2 var(--f-display)}
