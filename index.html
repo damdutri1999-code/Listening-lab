@@ -480,15 +480,16 @@ header.top .passages{display:none}
 .pickbox{display:flex;flex-direction:column;gap:8px;border:1.5px dashed var(--line);border-radius:var(--r);padding:12px}
 .pickhead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
 .teach .pickhead .tog{flex-direction:row;align-items:center;gap:6px;font-weight:600}
-.pickwords{display:flex;flex-wrap:wrap;gap:6px 4px;align-items:center;font-size:16px;line-height:1.4}
-.pickwords .pw{border:1.5px solid transparent;background:transparent;color:var(--ink);border-radius:8px;padding:3px 7px;font:inherit;font-weight:600;cursor:pointer}
+.pickwords{display:block;font-size:16px;line-height:2.2;max-height:420px;overflow:auto;padding:2px 4px}
+.pickwords .pw{border:1.5px solid transparent;background:transparent;color:var(--ink);border-radius:7px;padding:1px 4px;font:inherit;font-weight:600;cursor:pointer;margin:0}
 .pickwords .pw:hover{border-color:var(--line);background:var(--surface-2)}
 .pickwords .pw[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.pickwords .pw[aria-pressed="true"].join{border-radius:0 8px 8px 0;margin-left:-4px}
-.pickwords .pw[aria-pressed="true"].joinnext{border-radius:8px 0 0 8px}
+.pickwords .pw[aria-pressed="true"].join{border-radius:0 7px 7px 0;margin-left:-4px}
+.pickwords .pw[aria-pressed="true"].joinnext{border-radius:7px 0 0 7px}
 .pickwords .pw[aria-pressed="true"].join.joinnext{border-radius:0}
-.pickwords .pp{color:var(--muted);padding:0 2px 0 0}
-.pickwords .br{flex-basis:100%;height:0}
+.pickwords .pp{color:var(--muted);white-space:pre-wrap}
+.pickwords .spk{font:700 12px var(--f-mono);letter-spacing:.06em;color:var(--muted);background:var(--surface-2);border-radius:6px;padding:2px 7px;margin-right:2px}
+.pickwords .pgap{display:block;height:6px}
 .pv{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-radius:8px;background:var(--surface-2);min-height:44px}
 .pv span{font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
 .pv span.nz{border-style:dashed;color:var(--muted)}
@@ -1831,13 +1832,17 @@ function renderPreview0(){
 ["tText","tKeys","tNoise","tConns"].forEach(id=>$(id).addEventListener("input",renderPreview));
 /* ---- chọn từ khoá bằng cách bấm trên đoạn văn ---- */
 let pickToks=[], pickGrp=[], pickExtra=[];
-const PICK_SPLIT=/[.,!?;:]/;
+const PICK_SPLIT=/[.,!?;:\n()"“”]/;
 function renderPick(){
   const text=$("tText").value, box=$("tPick");
   if(!text.trim()){ pickToks=[]; pickGrp=[]; box.innerHTML="<em>Dán đoạn văn ở trên, các từ sẽ hiện ở đây để bạn bấm chọn.</em>"; $("tPickN").textContent=""; return; }
   // tokens: words and the text between them
   pickToks=[]; let last=0, m; const re=/[A-Za-z][A-Za-z'’-]*/g;
-  while((m=re.exec(text))){ pickToks.push({w:m[0],gap:text.slice(last,m.index)}); last=m.index+m[0].length; }
+  while((m=re.exec(text))){
+    const gap=text.slice(last,m.index), end=m.index+m[0].length;
+    const spk=m[0].length>=2&&m[0]===m[0].toUpperCase()&&(pickToks.length===0?!text.slice(0,m.index).trim():/\n/.test(gap))&&/^\s*:/.test(text.slice(end));
+    pickToks.push({w:m[0],gap,spk}); last=end;
+  }
   const tail=text.slice(last);
   // derive groups from the keyword list
   pickGrp=new Array(pickToks.length).fill(0); pickExtra=[];
@@ -1845,18 +1850,20 @@ function renderPick(){
   let cursor=0;
   lines($("tKeys").value).forEach((k,ki)=>{
     const kw=(k.match(/[A-Za-z][A-Za-z'’-]*/g)||[]).map(norm); if(!kw.length){ pickExtra.push(k); return; }
-    const find=(from)=>{ for(let i=from;i+kw.length<=pickToks.length;i++){ let ok=true; for(let j=0;j<kw.length;j++){ if(norm(pickToks[i+j].w)!==kw[j]||pickGrp[i+j]){ ok=false; break; } } if(ok) return i; } return -1; };
+    const find=(from)=>{ for(let i=from;i+kw.length<=pickToks.length;i++){ let ok=true; for(let j=0;j<kw.length;j++){ if(pickToks[i+j].spk||norm(pickToks[i+j].w)!==kw[j]||pickGrp[i+j]){ ok=false; break; } } if(ok) return i; } return -1; };
     let at=find(cursor); if(at<0) at=find(0);
     if(at<0){ pickExtra.push(k); return; }
     for(let j=0;j<kw.length;j++) pickGrp[at+j]=ki+1;
     cursor=at+kw.length;
   });
   const joinPrev=i=>i>0&&pickGrp[i]&&pickGrp[i]===pickGrp[i-1]&&!PICK_SPLIT.test(pickToks[i].gap);
+  const gapHtml=g=>esc(g).replace(/[ \t]+/g," ").replace(/\n[ \t]*\n+/g,"<br><span class=\"pgap\"></span>").replace(/\n/g,"<br>");
   box.innerHTML=pickToks.map((t,i)=>{
-    const sep=PICK_SPLIT.test(t.gap)?`<span class="pp">${esc(t.gap.replace(/\s+/g,"").slice(0,3))}</span>`:"";
     const jp=joinPrev(i), jn=i+1<pickToks.length&&joinPrev(i+1);
-    return sep+`<button type="button" class="pw${jp?" join":""}${jn?" joinnext":""}" data-i="${i}" aria-pressed="${!!pickGrp[i]}">${esc(t.w)}</button>`;
-  }).join("")+(tail.trim()?`<span class="pp">${esc(tail.trim().slice(0,3))}</span>`:"");
+    const g=t.gap?`<span class="pp">${gapHtml(t.gap)}</span>`:"";
+    if(t.spk) return g+`<b class="spk">${esc(t.w)}</b>`;
+    return g+`<button type="button" class="pw${jp?" join":""}${jn?" joinnext":""}" data-i="${i}" aria-pressed="${!!pickGrp[i]}">${esc(t.w)}</button>`;
+  }).join("")+(tail.trim()?`<span class="pp">${gapHtml(tail)}</span>`:"");
   box.querySelectorAll(".pw").forEach(b=>b.onclick=()=>pickToggle(+b.dataset.i));
   $("tPickN").textContent=lines($("tKeys").value).length+" từ khoá";
 }
