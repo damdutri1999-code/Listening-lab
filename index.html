@@ -970,8 +970,8 @@ const GUIDES={
     items:[["Lần 1 · Nghe dò","Bấm ▶ rồi vừa nghe vừa nhìn script. Câu đang đọc sẽ sáng lên, bám theo bằng mắt."],["Lần 2 và 3 · Shadowing","Nghe và đọc to theo ngay sau người đọc, bắt chước ngữ điệu và tốc độ. Script vẫn hiện để bạn nhìn."],["Xong 3 lần","Tick “I am ready” để sang bước 3. Nếu muốn bỏ qua bước này, tick “Bỏ qua bước này” bất cứ lúc nào."]],
     tip:"Mẹo: chỉnh tốc độ, giọng và thời gian nghỉ giữa các lần ở thanh phát. Chưa chắc thì nghe thêm trước khi tick."}),
   3:()=>({k:"Hướng dẫn · Bước 4",t:"Nghe dò lại đủ 2 lượt",
-    items:[["Nghe lại 2 lượt","Bấm ▶ để nghe lại cả bài. Bước này bắt buộc nghe đủ 2 lượt, không bỏ qua được."],[S.app==="dt"?"So với bài chép":"Kiểm tra bảng của bạn",S.app==="dt"?"Vừa nghe vừa nhìn lại những câu đã chép, xem có chỗ nào nghe sót.":"Bảng kéo thả hoặc ghi chú vẫn mở, bạn sửa, thêm hay nối lại từ khoá ngay trong lúc nghe."],["Hoàn thành vòng luyện","Nghe đủ 2 lượt thì tick “I am ready” để hoàn thành vòng luyện và nhận thưởng."]],
-    tip:"Mẹo: bấm “Xem script” nếu muốn đối chiếu lại bài sau khi nghe."}),
+    items:[["Nghe lại 2 lượt","Bấm ▶ để nghe lại cả bài và nhìn script đang hiện phía trên. Bước này bắt buộc nghe đủ 2 lượt, không bỏ qua được."],[S.app==="dt"?"So với bài chép":"Kiểm tra bảng của bạn",S.app==="dt"?"Vừa nghe vừa nhìn lại những câu đã chép, xem có chỗ nào nghe sót.":"Bảng kéo thả hoặc ghi chú vẫn mở, bạn sửa, thêm hay nối lại từ khoá ngay trong lúc nghe."],["Hoàn thành vòng luyện","Nghe đủ 2 lượt thì tick “I am ready” để hoàn thành vòng luyện và nhận thưởng."]],
+    tip:"Mẹo: script luôn hiện ở bước này, câu đang đọc sẽ sáng lên để bạn đối chiếu."}),
   2:()=>S.app==="dt"?({k:"Hướng dẫn · Bước 3",t:"Chép chính tả từng câu",
     items:[["Nghe từng câu","Bấm ▶, câu được đọc lặp theo số lần và thời gian chờ bạn chọn."],["Gõ lại rồi bấm Enter","Từ đúng hiện thành thẻ, từ sai rung lên để bạn sửa. Cần thì bấm Gợi ý hoặc Hiện đáp án."],["Làm hết các câu","Xong thì sang bước 4 để nghe dò lại cả bài."]],
     tip:"Mẹo: chấm tròn phía trên cho biết câu nào đã xong, bấm vào để quay lại câu đó."}):({k:"Hướng dẫn · Bước 3",t:"Bóc từ khoá: kéo thả hoặc tự điền",
@@ -1122,12 +1122,12 @@ function setStep(n,silent){
   const free=S.app==="dg"&&n===2;
   S.runs=free?S.runsC:(n===1?3:2); S.runDone=n<S.unlocked&&(n===1||n===3)?S.runs:0; if(n===1||n===3) S.showScript=n===3?S.showScript:false;
   $("stages").querySelectorAll(".stage").forEach(el=>{ const k=+el.dataset.s; el.classList.toggle("on",k===S.step); el.classList.toggle("done",k<S.unlocked); el.classList.toggle("can",k<=S.unlocked); el.classList.toggle("lock",k>S.unlocked); el.setAttribute("aria-current",k===S.step?"step":"false"); });
-  $("scriptPanel").hidden=!(n===0||n===1||(n===3&&S.showScript));
-  $("readyWrap1").hidden=n!==0; $("scHint").textContent=n===1?"Nghe và dò theo script: câu đang đọc sẽ sáng lên. Bấm vào từ nào bạn muốn tra.":"Đọc kỹ cả đoạn. Bấm vào bất kỳ từ nào để tra nghĩa hoặc nghe phát âm.";
+  $("scriptPanel").hidden=false;
+  $("readyWrap1").hidden=n!==0; $("scHint").textContent=n===1||n===3?"Nghe và dò theo script: câu đang đọc sẽ sáng lên. Bấm vào từ nào bạn muốn tra.":"Đọc kỹ cả đoạn. Bấm vào bất kỳ từ nào để tra nghĩa hoặc nghe phát âm.";
   $("playerPanel").hidden=!(n===1||n===3||free);
   $("playerPanel").classList.toggle("sticky",free||n===3);
   document.querySelector("#playerPanel .runs").hidden=true; $("readyWrapR").hidden=free; $("skipRowR").hidden=n!==1; $("runPlan").hidden=n!==1; $("guideBtn").hidden=!(n===1||n===2||n===3); $("lpCountGrp").hidden=!free; loopUI();
-  $("toggleScript").hidden=n!==3; $("toggleScript").textContent=S.showScript?"Ẩn script":"Xem script";
+  $("toggleScript").hidden=true; $("toggleScript").textContent=S.showScript?"Ẩn script":"Xem script";
   $("notesPanel").hidden=!(S.app==="dg"&&(n===2||n===3));
   $("s3finish").hidden=!(S.app==="dg"&&n===2);
   const dtm=S.app==="dt";
@@ -1153,7 +1153,7 @@ $("chk1").onchange=e=>{ $("ready1").classList.toggle("on",e.target.checked); if(
 $("skip1").onchange=e=>{ if(e.target.checked){ ting(2); setTimeout(()=>{ if($("skip1").checked){ setStep(1); showGuide(1); } },300); } };
 $("skipR").onchange=e=>{ if(e.target.checked){ ting(2); setTimeout(()=>{ if($("skipR").checked&&S.step===1){ setStep(2); showGuide(2); } },300); } };
 $("chkR").onchange=e=>{ updateReady(); if(!e.target.checked) return; ting(3); setTimeout(()=>{ if(!$("chkR").checked) return; if(S.step===1){ setStep(2); showGuide(2); } else if(S.step===3) completeRound(); },450); };
-$("toggleScript").onclick=()=>{ S.showScript=!S.showScript; $("toggleScript").textContent=S.showScript?"Ẩn script":"Xem script"; $("scriptPanel").hidden=!(S.step===3&&S.showScript); };
+$("toggleScript").onclick=()=>{ S.showScript=!S.showScript; $("toggleScript").textContent=S.showScript?"Ẩn script":"Xem script"; $("scriptPanel").hidden=false; };
 
 /* step 3: answer / self-check */
 function s3Mode(){ return S.mode==="free"?"free":"bank"; }
