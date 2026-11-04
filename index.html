@@ -313,6 +313,27 @@ header.top .passages{display:none}
 .panel.sticky .meta strong{font-size:16px;white-space:nowrap}
 .panel.sticky .plays{display:none}
 @media (max-width:640px){.panel.sticky .controls>.ctl:nth-child(-n+2){display:none}.panel.sticky .controls{gap:6px 14px}.panel.sticky .meta{display:none}.panel.sticky #restart{display:none}.panel.sticky .loopbar .label{display:none}.panel.sticky .seg-toggle button{padding:5px 8px}}
+.readywrap{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+.readywrap .ready{flex:1 1 320px}
+.skip{display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px dashed var(--line);border-radius:var(--r);cursor:pointer;user-select:none;font-weight:700;color:var(--muted);flex:0 1 auto}
+.skip input{width:22px;height:22px;accent-color:var(--muted);flex:none;cursor:inherit}
+.skip small{display:block;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.skip:hover{border-color:var(--ink);color:var(--ink)}
+.runplan{display:flex;flex-wrap:wrap;gap:8px}
+.runplan .rp{display:flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:99px;padding:5px 14px 5px 6px;font:700 13.5px var(--f-fun);color:var(--muted)}
+.runplan .rp i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--line);font:700 12px var(--f-mono)}
+.runplan .rp.now{border-color:var(--signal);color:var(--ink);background:var(--signal-soft)}
+.runplan .rp.now i{background:var(--signal);border-color:var(--signal);color:var(--accent-ink)}
+.runplan .rp.done{border-color:var(--good);color:var(--good)}
+.runplan .rp.done i{background:var(--good);border-color:var(--good);color:#fff}
+.guide{position:fixed;inset:0;z-index:110;display:grid;place-items:center;background:rgba(10,16,30,.6);padding:16px}
+.guide-card{width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);color:var(--ink);border:2px solid var(--ink);border-radius:var(--r);padding:22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 50px rgba(0,0,0,.45);animation:menudrop .2s ease-out}
+.guide-card h2{font-size:24px}
+.gd-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:g}
+.gd-list li{counter-increment:g;display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;line-height:1.5}
+.gd-list li::before{content:counter(g);width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:700 13px var(--f-mono)}
+.gd-list b{display:block}
+.gd-tip{margin:0;background:var(--surface-2);border-radius:8px;padding:9px 12px;font-size:13.5px;color:var(--muted)}
 .ready{display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px dashed var(--line);border-radius:var(--r);background:var(--surface-2);cursor:pointer;user-select:none;transition:background .2s,border-color .2s}
 .ready input{width:28px;height:28px;accent-color:var(--good);flex:none;cursor:inherit}
 .ready b{font:800 17px/1.2 var(--f-display)}
@@ -565,22 +586,25 @@ header.top .passages{display:none}
       <button role="tab" data-app="dg" aria-selected="true">Dictogloss · nghe cả đoạn</button>
       <button role="tab" data-app="dt" aria-selected="false">Dictation · chép chính tả</button>
     </div>
-    <div class="row"><button class="btn" id="toLessons">← Chọn bài khác</button><button class="btn" id="toCover">Trang chủ</button></div>
+    <div class="row"><button class="btn" id="guideBtn" hidden>Hướng dẫn</button><button class="btn" id="toLessons">← Chọn bài khác</button><button class="btn" id="toCover">Trang chủ</button></div>
   </div>
 
   <div class="view" id="flowView">
   <ol class="stages" id="stages">
     <li class="stage on" data-s="0"><div class="n">1</div><div><b>Đọc script</b><span>Đọc &amp; tra nghĩa trước</span></div></li>
-    <li class="stage" data-s="1"><div class="n">2</div><div><b>Nghe dò theo script</b><span>Chọn 1–5 lượt nghe</span></div></li>
+    <li class="stage" data-s="1"><div class="n">2</div><div><b>Nghe dò &amp; shadowing</b><span>1 lần nghe dò + 2 lần đọc theo</span></div></li>
     <li class="stage" data-s="2"><div class="n">3</div><div><b>Kéo thả / Tự điền</b><span>Bóc từ khoá, có đáp án</span></div></li>
-    <li class="stage" data-s="3"><div class="n">4</div><div><b>Nghe dò lại</b><span>1–3 lượt, vẫn kéo thả</span></div></li>
+    <li class="stage" data-s="3"><div class="n">4</div><div><b>Nghe dò lại</b><span>Bắt buộc nghe đủ 2 lượt</span></div></li>
   </ol>
 
   <section class="panel" id="scriptPanel" aria-labelledby="sc-h">
     <div class="panel-head"><h2 id="sc-h">Script bài nghe</h2><span class="count" id="scInfo"></span></div>
     <p class="hint" id="scHint">Đọc kỹ cả đoạn. Bấm vào bất kỳ từ nào để tra nghĩa hoặc nghe phát âm.</p>
     <div class="script" id="scriptText"></div>
-    <label class="ready" id="ready1"><input type="checkbox" id="chk1"><span><b>I am ready</b><small>Mình đã đọc và hiểu script, sang bước 2: nghe dò theo script</small></span></label>
+    <div class="readywrap" id="readyWrap1">
+      <label class="ready" id="ready1"><input type="checkbox" id="chk1"><span><b>I am ready</b><small>Mình đã đọc và hiểu script, sang bước 2: nghe dò và shadowing</small></span></label>
+      <label class="skip" id="skipRow1"><input type="checkbox" id="skip1"><span>Bỏ qua bước này<small>Skip</small></span></label>
+    </div>
   </section>
 
 
@@ -608,9 +632,13 @@ header.top .passages{display:none}
       </div>
       <span class="count loopinfo" id="loopInfo" aria-live="polite"></span>
     </div>
+    <div class="runplan" id="runPlan" aria-label="Kế hoạch 3 lần nghe" hidden></div>
     <div class="runs"><span class="label">Số lượt nghe</span><input type="range" id="runs" min="1" max="5" step="1" value="3" aria-label="Số lượt nghe"><output id="runsN" for="runs">3</output><span class="count" id="runsMax"></span></div>
     <p class="hint" id="hint"></p>
-    <label class="ready lock" id="readyRow"><input type="checkbox" id="chkR" disabled><span><b>I am ready</b><small id="readyNote"></small></span></label>
+    <div class="readywrap" id="readyWrapR">
+      <label class="ready lock" id="readyRow"><input type="checkbox" id="chkR" disabled><span><b>I am ready</b><small id="readyNote"></small></span></label>
+      <label class="skip" id="skipRowR"><input type="checkbox" id="skipR"><span>Bỏ qua bước này<small>Skip</small></span></label>
+    </div>
   </section>
 
   </div>
@@ -795,6 +823,15 @@ header.top .passages{display:none}
   </section>
 </div>
 <div class="reward" id="reward" hidden></div>
+<div class="guide" id="guide" hidden role="dialog" aria-modal="true" aria-labelledby="gdT">
+  <div class="guide-card">
+    <div class="label" id="gdK"></div>
+    <h2 id="gdT"></h2>
+    <ol class="gd-list" id="gdL"></ol>
+    <p class="gd-tip" id="gdTip"></p>
+    <div class="row" style="justify-content:flex-end"><button class="btn primary" id="gdGo" type="button">Đã hiểu, bắt đầu</button></div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -898,18 +935,18 @@ function speak(i,single){
   u.onend=()=>{ if(!S.playing) return; if(single){ S.playing=false; S.idx=0; setIcon(); renderTrack(); setMood("idle"); return; } S.timer=setTimeout(()=>speak(i+1),420); };
   synth.speak(u);
 }
-function play(){ if(!synth) return; synth.cancel(); clearInterval(S.iv); S.playing=true; setIcon(); setMood("listen"); $("loopInfo").textContent=S.runs>1?`Đang đọc lượt ${S.runDone+1}/${S.runs}`:""; speak(S.idx); }
+function play(){ if(!synth) return; synth.cancel(); clearInterval(S.iv); S.playing=true; setIcon(); setMood("listen"); $("loopInfo").textContent=S.step===1?`Lần ${S.runDone+1}/3 · ${runWord(S.runDone)}`:S.runs>1?`Đang đọc lượt ${S.runDone+1}/${S.runs}`:""; speak(S.idx); }
 function stop(){ S.playing=false; clearTimeout(S.timer); clearInterval(S.iv); if($("loopInfo")) $("loopInfo").textContent=""; if(synth) synth.cancel(); setIcon(); renderTrack(); }
 function finishPlay(){
   S.runDone++; S.idx=0; renderTrack(); renderDots(); updateReady();
   if(S.runDone<S.runs){
     const gap=Math.max(0,S.gapRun), t0=Date.now(), info=$("loopInfo");
-    const tick=()=>{ const left=Math.max(0,Math.ceil(gap-(Date.now()-t0)/1000)); info.textContent=`Xong lượt ${S.runDone}/${S.runs} · lặp lại sau ${left}s`; };
+    const tick=()=>{ const left=Math.max(0,Math.ceil(gap-(Date.now()-t0)/1000)); info.textContent=S.step===1?`Xong lần ${S.runDone}/3 · lần ${S.runDone+1} (${runWord(S.runDone)}) sau ${left}s`:`Xong lượt ${S.runDone}/${S.runs} · lặp lại sau ${left}s`; };
     if(gap>0){ tick(); S.iv=setInterval(tick,250); }
-    S.timer=setTimeout(()=>{ clearInterval(S.iv); if(S.playing){ info.textContent=`Đang đọc lượt ${S.runDone+1}/${S.runs}`; speak(0); } },gap>0?gap*1000:350);
+    S.timer=setTimeout(()=>{ clearInterval(S.iv); if(S.playing){ info.textContent=S.step===1?`Lần ${S.runDone+1}/3 · ${runWord(S.runDone)}`:`Đang đọc lượt ${S.runDone+1}/${S.runs}`; speak(0); } },gap>0?gap*1000:350);
   } else {
-    S.playing=false; setIcon(); setMood("idle"); $("loopInfo").textContent=S.runs>1?`Đã nghe đủ ${S.runs} lượt`:"";
-    $("hint").textContent=S.step===1?"Đã nghe đủ số lượt. Tick “I am ready” để sang bước 3, hoặc nghe thêm nếu chưa chắc.":S.step===3?"Đã nghe đủ số lượt. Tick “I am ready” để hoàn thành vòng luyện này.":"";
+    S.playing=false; setIcon(); setMood("idle"); $("loopInfo").textContent=S.step===1?"Đã xong 3 lần":S.runs>1?`Đã nghe đủ ${S.runs} lượt`:"";
+    $("hint").textContent=S.step===1?"Đã xong 3 lần (1 nghe dò + 2 shadowing). Tick “I am ready” để sang bước 3, hoặc nghe thêm nếu chưa chắc.":S.step===3?"Đã nghe đủ 2 lượt. Tick “I am ready” để hoàn thành vòng luyện này.":"";
   }
 }
 function setIcon(){ $("playIcon").innerHTML=S.playing?'<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>':'<path d="M7 4.5v15l13-7.5z"/>'; $("playBtn").setAttribute("aria-label",S.playing?"Tạm dừng":"Phát"); }
@@ -920,8 +957,38 @@ function renderTrack(){
   markScript();
   $("track").querySelectorAll(".seg").forEach(b=>b.onclick=()=>{ if(!synth) return; synth.cancel(); S.playing=true; setIcon(); setMood("listen"); speak(+b.dataset.i,true); });
 }
-function renderDots(){ const n=S.runs; $("dots").innerHTML=Array.from({length:n},(_,i)=>`<span class="dot ${i<S.runDone?'on':''}"></span>`).join(""); $("playsN").textContent=S.runDone+"/"+n; }
+const RUN_NAMES=["Nghe dò theo script","Shadowing: đọc to theo","Shadowing: đọc to theo"];
+function runWord(k){ return S.step===1?(k===0?"nghe dò":"shadowing"):""; }
+function renderPlan(){
+  const el=$("runPlan"); if(!el||S.step!==1){ return; }
+  el.innerHTML=RUN_NAMES.map((t,i)=>`<span class="rp ${i<S.runDone?"done":i===S.runDone?"now":""}"><i>${i<S.runDone?"✓":i+1}</i>Lần ${i+1} · ${t}</span>`).join("");
+}
+function renderDots(){ renderPlan(); const n=S.runs; $("dots").innerHTML=Array.from({length:n},(_,i)=>`<span class="dot ${i<S.runDone?'on':''}"></span>`).join(""); $("playsN").textContent=S.runDone+"/"+n; }
 function setStage(){}
+const GUIDES={
+  1:()=>({k:"Hướng dẫn · Bước 2",t:"Nghe dò theo script và shadowing",
+    items:[["Lần 1 · Nghe dò","Bấm ▶ rồi vừa nghe vừa nhìn script. Câu đang đọc sẽ sáng lên, bám theo bằng mắt."],["Lần 2 và 3 · Shadowing","Nghe và đọc to theo ngay sau người đọc, bắt chước ngữ điệu và tốc độ. Script vẫn hiện để bạn nhìn."],["Xong 3 lần","Tick “I am ready” để sang bước 3. Nếu muốn bỏ qua bước này, tick “Bỏ qua bước này” bất cứ lúc nào."]],
+    tip:"Mẹo: chỉnh tốc độ, giọng và thời gian nghỉ giữa các lần ở thanh phát. Chưa chắc thì nghe thêm trước khi tick."}),
+  3:()=>({k:"Hướng dẫn · Bước 4",t:"Nghe dò lại đủ 2 lượt",
+    items:[["Nghe lại 2 lượt","Bấm ▶ để nghe lại cả bài. Bước này bắt buộc nghe đủ 2 lượt, không bỏ qua được."],[S.app==="dt"?"So với bài chép":"Kiểm tra bảng của bạn",S.app==="dt"?"Vừa nghe vừa nhìn lại những câu đã chép, xem có chỗ nào nghe sót.":"Bảng kéo thả hoặc ghi chú vẫn mở, bạn sửa, thêm hay nối lại từ khoá ngay trong lúc nghe."],["Hoàn thành vòng luyện","Nghe đủ 2 lượt thì tick “I am ready” để hoàn thành vòng luyện và nhận thưởng."]],
+    tip:"Mẹo: bấm “Xem script” nếu muốn đối chiếu lại bài sau khi nghe."}),
+  2:()=>S.app==="dt"?({k:"Hướng dẫn · Bước 3",t:"Chép chính tả từng câu",
+    items:[["Nghe từng câu","Bấm ▶, câu được đọc lặp theo số lần và thời gian chờ bạn chọn."],["Gõ lại rồi bấm Enter","Từ đúng hiện thành thẻ, từ sai rung lên để bạn sửa. Cần thì bấm Gợi ý hoặc Hiện đáp án."],["Làm hết các câu","Xong thì sang bước 4 để nghe dò lại cả bài."]],
+    tip:"Mẹo: chấm tròn phía trên cho biết câu nào đã xong, bấm vào để quay lại câu đó."}):({k:"Hướng dẫn · Bước 3",t:"Bóc từ khoá: kéo thả hoặc tự điền",
+    items:[["Chọn cách chơi","“Chơi game kéo thả”: kéo từ khoá từ rổ sang bảng. “Tự điền”: tự ghi từ khoá, bấm Tab để chèn mũi tên →."],["Nối thành chuỗi ý","Kéo thẻ sát nhau theo 8 hướng để nối, bấm vào mũi tên để thêm từ nối như because, then."],["Xem đáp án","Xong thì tick để đối chiếu đáp án (hoặc tự kiểm tra), rồi làm thêm phần còn lại hoặc sang bước 4."]],
+    tip:"Mẹo: thanh phát audio luôn dính phía trên, bạn vừa nghe lại vừa kéo thả được."})
+};
+function showGuide(stage){
+  const g=GUIDES[stage]; if(!g) return; const d=g();
+  $("gdK").textContent=d.k; $("gdT").textContent=d.t; $("gdTip").textContent=d.tip;
+  $("gdL").innerHTML=d.items.map(([b,t])=>`<li><span><b>${esc(b)}</b>${esc(t)}</span></li>`).join("");
+  $("guide").hidden=false; $("gdGo").focus();
+}
+function closeGuide(){ $("guide").hidden=true; }
+$("gdGo").onclick=closeGuide;
+$("guide").addEventListener("click",e=>{ if(e.target===$("guide")) closeGuide(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("guide").hidden) closeGuide(); });
+$("guideBtn").onclick=()=>showGuide(S.step);
 
 /* ================= mode + skin ================= */
 function setMode(m){ S.mode=m; $("tabFree").setAttribute("aria-selected",m==="free"); $("tabBank").setAttribute("aria-selected",m==="bank"); $("paneFree").hidden=m!=="free"; $("paneBank").style.display=m==="bank"?"flex":"none"; if(m==="bank") requestAnimationFrame(renderBoard); store.set("dg2-mode",m); renderS3(); }
@@ -1053,23 +1120,23 @@ function setStep(n,silent){
   closeLookup(); stop();
   n=Math.max(0,Math.min(3,n)); S.step=n; if(n>S.unlocked) S.unlocked=n;
   const free=S.app==="dg"&&n===2;
-  S.runs=free?S.runsC:(n===1?S.runsA:S.runsB); S.runDone=n<S.unlocked&&(n===1||n===3)?S.runs:0; if(n===1||n===3) S.showScript=n===3?S.showScript:false;
+  S.runs=free?S.runsC:(n===1?3:2); S.runDone=n<S.unlocked&&(n===1||n===3)?S.runs:0; if(n===1||n===3) S.showScript=n===3?S.showScript:false;
   $("stages").querySelectorAll(".stage").forEach(el=>{ const k=+el.dataset.s; el.classList.toggle("on",k===S.step); el.classList.toggle("done",k<S.unlocked); el.classList.toggle("can",k<=S.unlocked); el.classList.toggle("lock",k>S.unlocked); el.setAttribute("aria-current",k===S.step?"step":"false"); });
   $("scriptPanel").hidden=!(n===0||n===1||(n===3&&S.showScript));
-  $("ready1").hidden=n!==0; $("scHint").textContent=n===1?"Nghe và dò theo script: câu đang đọc sẽ sáng lên. Bấm vào từ nào bạn muốn tra.":"Đọc kỹ cả đoạn. Bấm vào bất kỳ từ nào để tra nghĩa hoặc nghe phát âm.";
+  $("readyWrap1").hidden=n!==0; $("scHint").textContent=n===1?"Nghe và dò theo script: câu đang đọc sẽ sáng lên. Bấm vào từ nào bạn muốn tra.":"Đọc kỹ cả đoạn. Bấm vào bất kỳ từ nào để tra nghĩa hoặc nghe phát âm.";
   $("playerPanel").hidden=!(n===1||n===3||free);
   $("playerPanel").classList.toggle("sticky",free||n===3);
-  document.querySelector("#playerPanel .runs").hidden=free; $("readyRow").hidden=free; $("lpCountGrp").hidden=!free; loopUI();
+  document.querySelector("#playerPanel .runs").hidden=true; $("readyWrapR").hidden=free; $("skipRowR").hidden=n!==1; $("runPlan").hidden=n!==1; $("guideBtn").hidden=!(n===1||n===2||n===3); $("lpCountGrp").hidden=!free; loopUI();
   $("toggleScript").hidden=n!==3; $("toggleScript").textContent=S.showScript?"Ẩn script":"Xem script";
   $("notesPanel").hidden=!(S.app==="dg"&&(n===2||n===3));
   $("s3finish").hidden=!(S.app==="dg"&&n===2);
   const dtm=S.app==="dt";
   $("stages").querySelector('[data-s="2"] b').textContent=dtm?"Chép chính tả":"Kéo thả / Tự điền";
   $("stages").querySelector('[data-s="2"] span').textContent=dtm?"Nghe từng câu, gõ lại":"Bóc từ khoá, có đáp án";
-  $("stages").querySelector('[data-s="3"] span').textContent=dtm?"1–3 lượt nghe lại":"1–3 lượt, vẫn kéo thả";
+  $("stages").querySelector('[data-s="3"] span').textContent=dtm?"Nghe lại đủ 2 lượt":"Nghe lại đủ 2 lượt, vẫn kéo thả";
   $("runs").max=runsMax(); $("runs").value=S.runs; $("runsN").textContent=S.runs; $("runsMax").textContent=`(chọn 1–${runsMax()})`;
-  $("chk1").checked=false; $("chkR").checked=false;
-  $("hint").textContent=n===1?"Bấm ▶ để bắt đầu. Bài sẽ được đọc lần lượt theo số lượt bạn chọn, tick “I am ready” khi nghe đủ.":n===3?"Nghe dò lại để kiểm tra những gì bạn đã bóc. Bạn vẫn kéo thả hoặc tự điền được trong lúc nghe.":free?"Nghe lại bất cứ lúc nào khi bóc từ: chọn số lần lặp và thời gian nghỉ, bấm ▶ để nghe cả bài, hoặc bấm từng đoạn trên thanh để nghe riêng từng câu.":"";
+  $("chk1").checked=false; $("chkR").checked=false; $("skip1").checked=false; $("skipR").checked=false; $("ready1").classList.remove("on");
+  $("hint").textContent=n===1?"Bấm ▶ để bắt đầu. Lần 1: nghe và dò theo script. Lần 2 và 3: vừa nghe vừa đọc to theo (shadowing). Xong 3 lần thì tick “I am ready”, hoặc tick “Bỏ qua”.":n===3?"Nghe dò lại đủ 2 lượt để kiểm tra những gì bạn đã bóc. Bạn vẫn kéo thả hoặc tự điền được trong lúc nghe.":free?"Nghe lại bất cứ lúc nào khi bóc từ: chọn số lần lặp và thời gian nghỉ, bấm ▶ để nghe cả bài, hoặc bấm từng đoạn trên thanh để nghe riêng từng câu.":"";
   renderDots(); renderTrack(); updateReady(); renderS3();
   applyViews();
   if(S.app==="dg"&&(n===2||n===3)) requestAnimationFrame(()=>{ renderBoard(); });
@@ -1079,11 +1146,13 @@ $("stages").querySelectorAll(".stage").forEach(el=>{ el.onclick=()=>{ const k=+e
 function updateReady(){
   const can=S.runDone>=S.runs||S.step<S.unlocked, row=$("readyRow");
   $("chkR").disabled=!can; row.classList.toggle("lock",!can); row.classList.toggle("on",$("chkR").checked);
-  $("readyNote").textContent=can?(S.step===1?"Mình đã nghe dò xong, sang bước 3: kéo thả hoặc tự điền":"Mình đã nghe lại xong, hoàn thành vòng luyện này"):`Nghe đủ ${S.runs} lượt để mở khoá (đã nghe ${S.runDone}/${S.runs})`;
+  $("readyNote").textContent=can?(S.step===1?"Mình đã nghe dò và shadowing xong 3 lần, sang bước 3":"Mình đã nghe lại đủ 2 lượt, hoàn thành vòng luyện này"):(S.step===1?`Xong đủ 3 lần để mở khoá (đã xong ${S.runDone}/3), hoặc tick “Bỏ qua”`:`Bắt buộc nghe đủ 2 lượt để mở khoá (đã nghe ${S.runDone}/2)`);
 }
-$("runs").oninput=e=>{ const v=Math.max(1,Math.min(runsMax(),+e.target.value||1)); S.runs=v; if(S.step===1) S.runsA=v; else S.runsB=v; $("runsN").textContent=v; renderDots(); updateReady(); };
-$("chk1").onchange=e=>{ $("ready1").classList.toggle("on",e.target.checked); if(e.target.checked){ ting(2); setTimeout(()=>{ if($("chk1").checked) setStep(1); },450); } };
-$("chkR").onchange=e=>{ updateReady(); if(!e.target.checked) return; ting(3); setTimeout(()=>{ if(!$("chkR").checked) return; if(S.step===1) setStep(2); else if(S.step===3) completeRound(); },450); };
+$("runs").oninput=e=>{ const v=Math.max(1,Math.min(runsMax(),+e.target.value||1)); S.runs=v; if(S.step!==1) S.runsB=v; $("runsN").textContent=v; renderDots(); updateReady(); };
+$("chk1").onchange=e=>{ $("ready1").classList.toggle("on",e.target.checked); if(e.target.checked){ ting(2); setTimeout(()=>{ if($("chk1").checked){ setStep(1); showGuide(1); } },450); } };
+$("skip1").onchange=e=>{ if(e.target.checked){ ting(2); setTimeout(()=>{ if($("skip1").checked){ setStep(1); showGuide(1); } },300); } };
+$("skipR").onchange=e=>{ if(e.target.checked){ ting(2); setTimeout(()=>{ if($("skipR").checked&&S.step===1){ setStep(2); showGuide(2); } },300); } };
+$("chkR").onchange=e=>{ updateReady(); if(!e.target.checked) return; ting(3); setTimeout(()=>{ if(!$("chkR").checked) return; if(S.step===1){ setStep(2); showGuide(2); } else if(S.step===3) completeRound(); },450); };
 $("toggleScript").onclick=()=>{ S.showScript=!S.showScript; $("toggleScript").textContent=S.showScript?"Ẩn script":"Xem script"; $("scriptPanel").hidden=!(S.step===3&&S.showScript); };
 
 /* step 3: answer / self-check */
@@ -1112,7 +1181,7 @@ function renderS3(){
 }
 $("chk3").onchange=e=>{ S.d3[s3Mode()]=e.target.checked; if(e.target.checked){ ting(3); setMood("happy"); say("Giỏi lắm! Xem đáp án nhé."); } renderS3(); saveState(); };
 $("s3more").onclick=e=>{ setMode(e.currentTarget.dataset.to==="free"?"free":"bank"); };
-$("s3next").onclick=()=>setStep(3);
+$("s3next").onclick=()=>{ setStep(3); showGuide(3); };
 function newRound(){
   if(S.app==="dt"){ DT.done=DT.done.map(()=>false); DT.ft=DT.ft.map(()=>false); DT.rev=DT.rev.map(()=>false); DT.hints=DT.hints.map(()=>({})); DT.plays=DT.plays.map(()=>0); DT.tries=DT.tries.map(()=>0); DT.combo=0; DT.finished=false; DT.ops=null; DT.i=0; S.unlocked=0; S.step=0; S.roundDone=false; $("dtIn").value=""; dtSave(); setStep(0); return; }
   S.unlocked=0; S.step=0; S.d3={bank:false,free:false}; S.selfKw=new Set(); S.roundDone=false; S.chains=[]; S.bankOrder=shuffle(allWords()); S.combo=0; S.links=0; $("freeNotes").value="";
@@ -1704,7 +1773,7 @@ function dtRender(){
   if(all){ const ok=DT.done.filter((d,i)=>d&&!DT.rev[i]).length, ft=DT.ft.filter(Boolean).length, hints=DT.hints.reduce((a,h)=>a+Object.keys(h||{}).length,0);
     $("dtFinRes").innerHTML=`<span class="label">Kết quả chép chính tả</span><div class="chainans">Đúng <b>${ok}/${n}</b> câu · <b>${ft}</b> câu đúng ngay lần đầu · <b>${hints}</b> lần dùng gợi ý · combo cao nhất ×${DT.best}</div>`; }
 }
-$("dtToStep4").onclick=()=>setStep(3);
+$("dtToStep4").onclick=()=>{ setStep(3); showGuide(3); };
 function dtGo(i){ DT.i=Math.max(0,Math.min(dtN()-1,i)); DT.ops=null; DT.finished=false; $("dtIn").value=""; $("dtMsg").textContent=""; stopDt(); dtRender(); dtSave(); if(!DT.done[DT.i]) $("dtIn").focus({preventScroll:true}); }
 function stopDt(){ DT.tok=(DT.tok||0)+1; clearTimeout(DT.tm); clearInterval(DT.iv); if(synth) synth.cancel(); DT.playing=false; dtPlayUI(); if(DT.ready&&S.p) $("dtPlays").textContent=`Đã nghe ${DT.plays[DT.i]||0} lần`; }
 function dtPlayUI(){ $("dtPlay").classList.toggle("on",DT.playing); $("dtPlay").setAttribute("aria-label",DT.playing?"Dừng":"Nghe câu này"); $("dtPlay").innerHTML=DT.playing?'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>'; }
@@ -1792,7 +1861,7 @@ $("dtReveal").onclick=()=>{
 };
 $("dtNext").onclick=()=>{
   const n=dtN();
-  if(DT.done.every(Boolean)&&DT.i>=n-1){ setStep(3); return; }
+  if(DT.done.every(Boolean)&&DT.i>=n-1){ setStep(3); showGuide(3); return; }
   let nx=DT.i+1<n?DT.i+1:DT.done.findIndex(x=>!x);
   if(nx<0) nx=0; dtGo(nx);
 };
