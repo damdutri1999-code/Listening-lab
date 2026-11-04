@@ -988,12 +988,12 @@ const GUIDES={
     items:[["Lần 1 · Nghe dò","Bấm ▶ rồi vừa nghe vừa nhìn script. Câu đang đọc sẽ sáng lên, bám theo bằng mắt."],["Lần 2 và 3 · Shadowing","Nghe và đọc to theo ngay sau người đọc, bắt chước ngữ điệu và tốc độ. Script vẫn hiện để bạn nhìn."],["Xong 3 lần","Tick “I am ready” để sang bước 3. Nếu muốn bỏ qua bước này, tick “Bỏ qua bước này” bất cứ lúc nào."]],
     tip:"Mẹo: chỉnh tốc độ, giọng và thời gian nghỉ giữa các lần ở thanh phát. Chưa chắc thì nghe thêm trước khi tick."}),
   3:()=>({k:"Hướng dẫn · Bước 4",t:"Nghe dò lại đủ 2 lượt",
-    items:[["Nghe lại 2 lượt","Bấm ▶ để nghe lại cả bài và nhìn script đang hiện phía trên. Bước này bắt buộc nghe đủ 2 lượt, không bỏ qua được."],[S.app==="dt"?"So với bài chép":"Kiểm tra bảng của bạn",S.app==="dt"?"Vừa nghe vừa nhìn lại những câu đã chép, xem có chỗ nào nghe sót.":"Bảng kéo thả hoặc ghi chú vẫn mở, bạn sửa, thêm hay nối lại từ khoá ngay trong lúc nghe."],["Hoàn thành vòng luyện","Nghe đủ 2 lượt thì tick “I am ready” để hoàn thành vòng luyện và nhận thưởng."]],
+    items:[["Nghe lại 2 lượt","Bấm ▶ để nghe lại cả bài và nhìn script đang hiện phía trên. Bước này bắt buộc nghe đủ 2 lượt, không bỏ qua được."],[S.app==="dt"?"So với bài chép":"Sắp xếp và nối thẻ",S.app==="dt"?"Vừa nghe vừa nhìn lại những câu đã chép, xem có chỗ nào nghe sót.":"Bảng vẫn mở. Vừa nghe vừa sắp xếp lại các thẻ, kéo chúng sát nhau (8 hướng) để nối thành chuỗi ý, bấm vào mũi tên để thêm từ nối như because, then."],["Hoàn thành vòng luyện","Nghe đủ 2 lượt thì tick “I am ready” để hoàn thành vòng luyện và nhận thưởng."]],
     tip:"Mẹo: script luôn hiện ở bước này, câu đang đọc sẽ sáng lên để bạn đối chiếu."}),
   2:()=>S.app==="dt"?({k:"Hướng dẫn · Bước 3",t:"Chép chính tả từng câu",
     items:[["Nghe từng câu","Bấm ▶, câu được đọc lặp theo số lần và thời gian chờ bạn chọn."],["Gõ lại rồi bấm Enter","Từ đúng hiện thành thẻ, từ sai rung lên để bạn sửa. Cần thì bấm Gợi ý hoặc Hiện đáp án."],["Làm hết các câu","Xong thì sang bước 4 để nghe dò lại cả bài."]],
     tip:"Mẹo: chấm tròn phía trên cho biết câu nào đã xong, bấm vào để quay lại câu đó."}):({k:"Hướng dẫn · Bước 3",t:"Bóc từ khoá: kéo thả hoặc tự điền",
-    items:[["Chọn cách chơi","“Chơi game kéo thả”: kéo từ khoá từ rổ sang bảng. “Tự điền”: tự ghi từ khoá, bấm Tab để chèn mũi tên →."],["Nối thành chuỗi ý","Kéo thẻ sát nhau theo 8 hướng để nối, bấm vào mũi tên để thêm từ nối như because, then."],["Xem đáp án","Xong thì tick để đối chiếu đáp án (hoặc tự kiểm tra), rồi làm thêm phần còn lại hoặc sang bước 4."]],
+    items:[["Chọn từ khoá theo thứ tự nghe được","Bấm từ trong rổ để xếp vào bảng. Từ nào bấm trước sẽ xếp trước, từ trái sang phải rồi xuống hàng. Muốn tự ghi thì chọn “Tự điền”, bấm Tab để chèn mũi tên →."],["Chưa cần nối ngay","Cứ chọn đủ từ khoá bạn nghe được. Việc kéo thẻ nối với nhau để dành cho lúc nghe lại ở bước 4."],["Xem đáp án","Xong thì tick để đối chiếu đáp án (hoặc tự kiểm tra), rồi làm thêm phần còn lại hoặc sang bước 4."]],
     tip:"Mẹo: thanh phát audio luôn dính phía trên, bạn vừa nghe lại vừa kéo thả được."})
 };
 function showGuide(stage){
@@ -1029,7 +1029,7 @@ document.addEventListener("keydown",e=>{
 function setSkin(k,silent){
   S.skin=k; const sk=SKINS[k]; document.documentElement.dataset.skin=k;
   $("playArea").className="arena sk-"+k; $("dtArena").className="arena dtarena sk-"+k;
-  $("bankLabel").textContent=sk.bank; $("boardLabel").textContent=sk.board; $("boardEmpty").innerHTML=sk.empty; $("ret").textContent=sk.ret;
+  $("bankLabel").textContent=sk.bank; $("boardLabel").textContent=sk.board; $("boardEmpty").innerHTML="Bấm từ trong rổ để xếp vào đây.<br>Từ nào bấm trước sẽ xếp trước, kéo thẻ sát nhau để nối sau."; $("ret").textContent=sk.ret;
   let flat=false; if(!sk.vertical) S.chains.forEach(c=>c.items.forEach((it,i)=>{ if(i&&it.dir==="u"){ it.dir="r"; flat=true; } }));
   $("cvMochi").innerHTML=mochiSVG("happy"); $("mochiSvg").innerHTML=mochiSVG("idle"); $("dtMochiSvg").innerHTML=mochiSVG("idle");
   renderSkins(); dtRender(); renderBank(); renderBoard(); if(flat&&board.clientWidth) tidyBoard();
@@ -1154,7 +1154,7 @@ function setStep(n,silent){
   $("stages").querySelector('[data-s="3"] span').textContent=dtm?"Nghe lại đủ 2 lượt":"Nghe lại đủ 2 lượt, vẫn kéo thả";
   $("runs").max=runsMax(); $("runs").value=S.runs; $("runsN").textContent=S.runs; $("runsMax").textContent=`(chọn 1–${runsMax()})`;
   $("chk1").checked=false; $("chkR").checked=false; $("skip1").checked=false; $("skipR").checked=false; $("ready1").classList.remove("on");
-  $("hint").textContent=n===1?"Bấm ▶ để bắt đầu. Lần 1: nghe và dò theo script. Lần 2 và 3: vừa nghe vừa đọc to theo (shadowing). Xong 3 lần thì tick “I am ready”, hoặc tick “Bỏ qua”.":n===3?"Nghe dò lại đủ 2 lượt để kiểm tra những gì bạn đã bóc. Bạn vẫn kéo thả hoặc tự điền được trong lúc nghe.":free?"Nghe lại bất cứ lúc nào khi bóc từ: chọn số lần lặp và thời gian nghỉ, bấm ▶ để nghe cả bài, hoặc bấm từng đoạn trên thanh để nghe riêng từng câu.":"";
+  $("hint").textContent=n===1?"Bấm ▶ để bắt đầu. Lần 1: nghe và dò theo script. Lần 2 và 3: vừa nghe vừa đọc to theo (shadowing). Xong 3 lần thì tick “I am ready”, hoặc tick “Bỏ qua”.":n===3?"Nghe dò lại đủ 2 lượt để kiểm tra những gì bạn đã bóc. Bạn vẫn kéo thả hoặc tự điền được trong lúc nghe.":free?"Bấm từ khoá trong rổ khi bạn nghe thấy, từ nào bấm trước sẽ xếp trước trên bảng. Nghe lại bất cứ lúc nào bằng ▶ hoặc bấm từng đoạn trên thanh để nghe riêng từng câu.":"";
   renderDots(); renderTrack(); updateReady(); renderS3();
   applyViews();
   if(S.app==="dg"&&(n===2||n===3)) requestAnimationFrame(()=>{ renderBoard(); });
@@ -1385,19 +1385,24 @@ function detachItem(c,i,toBank){
 function returnChain(c){ S.chains=S.chains.filter(x=>x!==c); renderAll(); saveState(); }
 function renderAll(){ renderBank(); renderBoard(); updateHud(); saveState(); }
 
+function measureTile(w){
+  const el=document.createElement("span"); el.className="tk "+tileClass(w); el.style.cssText="position:absolute;visibility:hidden;left:0;top:0";
+  el.textContent=w; board.appendChild(el); const r={w:el.offsetWidth||Math.min(260,30+w.length*9),h:el.offsetHeight||34}; el.remove(); return r;
+}
+/* Bấm từ trong rổ: thẻ được xếp vào bảng theo đúng thứ tự bấm (trái sang phải, hết hàng thì xuống hàng) */
 function placeFree(w){
-  const W=board.clientWidth||800, H=board.clientHeight||440;
-  const taken=S.chains.map(c=>bbox(c));
-  const est=Math.min(260,30+w.length*8);
-  for(let y=44;y<H-40;y+=46){
-    for(let x=14;x<W-est-10;x+=24){
-      const box={x0:x-10,y0:y-10,x1:x+est+10,y1:y+38};
-      if(!taken.some(t=>!(box.x1<t.x0||box.x0>t.x1||box.y1<t.y0||box.y0>t.y1))){
-        const c=newChain([{w,dir:"",conn:"",_pop:true}],x,y); afterDropFromBank(); return c;
-      }
+  const W=board.clientWidth||800, H=board.clientHeight||440, m=measureTile(w);
+  const taken=S.chains.map(c=>{ measure(c); return bbox(c); });
+  const GX=22, GY=14, rowH=Math.max(52,m.h+GY+8);
+  const fits=(x,y)=>{ const box={x0:x-GX/2,y0:y-GY/2,x1:x+m.w+GX/2,y1:y+m.h+GY/2}; return !taken.some(t=>!(box.x1<t.x0||box.x0>t.x1||box.y1<t.y0||box.y0>t.y1)); };
+  for(let y=44;y<H-48;y+=rowH){
+    for(let x=16;x<=W-m.w-16;x+=8){
+      if(fits(x,y)){ const c=newChain([{w,dir:"",conn:"",_pop:true}],x,y); afterDropFromBank(); return c; }
     }
   }
-  newChain([{w,dir:"",conn:"",_pop:true}],20+Math.random()*(W-200),50+Math.random()*(H-120)); afterDropFromBank();
+  // bảng đã đầy hàng: xếp tiếp phía dưới tất cả thẻ hiện có
+  const lowest=taken.length?Math.max(...taken.map(t=>t.y1)):30;
+  const c=newChain([{w,dir:"",conn:"",_pop:true}],16,Math.min(lowest+GY+8,Math.max(44,H-48))); afterDropFromBank(); return c;
 }
 function afterDropFromBank(){ if(S.stage<1) setStage(1); renderAll(); }
 
