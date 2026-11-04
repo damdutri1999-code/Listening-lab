@@ -46,10 +46,23 @@ header.top p{margin:4px 0 0;color:var(--muted);max-width:60ch}
 .stage:last-child{border-right:0}
 .stage .n{font-family:var(--f-mono);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);color:var(--muted);flex:none}
 .stage b{display:block;font-size:14px}
+/* trong bài: thanh bước gọn một dòng, mô tả đầy đủ nằm ở trang chọn bài */
+.stages .stage{padding:7px 12px;align-items:center}
+.stages .stage span{display:none}
+.stages .stage .n{width:22px;height:22px;font-size:12px}
+.stages .stage b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ls-flowbox{display:flex;flex-direction:column;gap:8px}
+.ls-flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ls-flow li{display:grid;grid-template-columns:30px 1fr;gap:4px 10px;align-items:start;border:1.5px solid var(--line);border-radius:var(--r);padding:12px;background:var(--surface)}
+.ls-flow li i{font-style:normal;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:700 13px var(--f-mono);grid-row:span 2}
+.ls-flow li b{font:800 15px/1.25 var(--f-display)}
+.ls-flow li span{font-size:13px;color:var(--muted);line-height:1.4}
+@media (max-width:900px){.ls-flow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.ls-flow{grid-template-columns:1fr}}
 .stage span{font-size:12.5px;color:var(--muted)}
 .stage.on .n{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .stage.done .n{border-color:var(--accent);color:var(--accent)}
-@media (max-width:760px){.stages{grid-template-columns:repeat(2,1fr)}.stage:nth-child(2){border-right:0}.stage:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+@media (max-width:760px){.stages .stage{padding:7px 6px;justify-content:center;gap:0}.stages .stage b{display:none}.stages .stage.on b{display:block;margin-left:6px}.stages .stage.on{flex:none}.stages{display:flex}.stages .stage:not(.on){flex:1}}
 
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:900px){.grid{grid-template-columns:1fr}}
@@ -569,6 +582,10 @@ header.top .passages{display:none}
       <h1 id="ls-h">Chọn bài nghe</h1>
       <p class="lsub" id="lsSub"></p>
     </div>
+    <section class="ls-flowbox" aria-labelledby="lsFlowH">
+      <div class="label" id="lsFlowH">Quy trình luyện nghe · 4 bước</div>
+      <ol class="ls-flow" id="lsFlow"></ol>
+    </section>
     <div class="ls-grid" id="lsGrid"></div>
   </section>
 
@@ -1684,6 +1701,7 @@ function renderLessons(){
   const a=S.pickApp||"dg", all=allLessons();
   $("lsKicker").textContent="Chế độ "+APPN[a]; $("lsSub").textContent=a==="dt"?"Mỗi bài được đọc từng câu một, bạn gõ lại chính xác từng câu.":"Mỗi bài là một đoạn văn ngắn, bạn nghe cả đoạn rồi bóc từ khoá, nối chuỗi và viết lại.";
   $("lsSwap").textContent="Đổi sang "+APPN[a==="dt"?"dg":"dt"];
+  $("lsFlow").innerHTML=[["Đọc script","Đọc và tra nghĩa, tick “I am ready” hoặc bỏ qua"],["Nghe dò & shadowing","1 lần nghe dò theo script, 2 lần đọc to theo"],a==="dt"?["Chép chính tả","Nghe từng câu, gõ lại chính xác"]:["Kéo thả / Tự điền","Bóc từ khoá, nối chuỗi ý, có đáp án"],["Nghe dò lại","Bắt buộc nghe đủ 2 lượt, script luôn hiện"]].map(([t,d],i)=>`<li><i>${i+1}</i><b>${esc(t)}</b><span>${esc(d)}</span></li>`).join("");
   $("lsGrid").innerHTML=all.map(p=>{
     const n=splitSentences(p.text).length, w=words(p.text).length, pr=lessonProgress(p,a);
     return `<button class="ls-card" data-id="${esc(p.id)}"><span class="ls-top"><span class="ls-lv">${esc(p.level||"–")}</span>${p.teacher?'<span class="ls-tag">Giáo viên soạn</span>':""}</span><strong>${esc(p.title)}</strong><span class="ls-meta">${n} câu · ${w} từ${a==="dg"?` · ${p.keys.length} từ khoá`:""}</span><span class="ls-prog"><i style="width:${Math.round(pr.pct*100)}%"></i></span><span class="ls-foot"><em>${pr.txt}</em><span class="ls-go">Làm bài ▸</span></span></button>`;
