@@ -667,6 +667,7 @@ header.top .passages{display:none}
 
 .aubox{display:flex;flex-direction:column;gap:8px;border:1.5px dashed var(--line);border-radius:var(--r);padding:12px}
 .aubox audio{width:100%;height:36px}
+.aubox.dropping{border-style:solid;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
 .aubox .aurow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .marks{display:flex;flex-direction:column;gap:4px;max-height:340px;overflow:auto;padding-right:4px}
 .mk{display:grid;grid-template-columns:26px minmax(0,1fr) 86px 32px 32px;gap:6px;align-items:center;font-size:13px}
@@ -674,6 +675,16 @@ header.top .passages{display:none}
 .mk input{padding:5px 6px!important;font-size:13px!important}
 .mk input.bad{border-color:#d33!important;background:#fff0f0}
 .mk .btn{padding:4px 0;min-width:0}
+.splitbox{display:flex;flex-direction:column;gap:8px;border-top:1.5px dashed var(--line);padding-top:10px}
+.teach label.sprow,.sprow{display:grid;flex-direction:initial;font-weight:500;cursor:pointer;grid-template-columns:26px 22px minmax(0,1fr);gap:6px;align-items:center;font-size:13px}
+.sprow.cut{background:var(--signal-soft);border-radius:6px}
+.sprow input{accent-color:var(--accent);width:18px;height:18px}
+.sprow .mt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.splitparts{display:flex;flex-direction:column;gap:6px}
+.sppart{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:center;font-size:13px}
+.sppart b{font:700 12px var(--f-mono);color:var(--accent)}
+.sppart small{grid-column:1/-1;color:var(--muted);margin-top:-4px}
+.sppart input{font:inherit;font-size:13px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:0}
 .aubadge{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
 .aubadge.ok{color:#18794e;border-color:#18794e}
 .aubadge.warn{color:#b45309;border-color:#b45309}
@@ -1005,13 +1016,21 @@ header.top .passages{display:none}
       <div><div class="label" style="margin-bottom:6px">Xem trước rổ từ và khay từ nối</div><div class="pv" id="tPreview"><em>Từ khoá sẽ hiện ở đây.</em></div></div>
       <div class="aubox" id="tAuBox">
         <div class="label">Audio của bài <span class="count">· dùng chung cho mọi chế độ luyện nghe (không bắt buộc, để trống thì dùng giọng đọc máy)</span></div>
-        <label>Link audio (Google Drive, Supabase hoặc link trực tiếp tới file mp3/m4a)<input id="tAudio" placeholder="https://drive.google.com/file/d/…/view" autocomplete="off"></label>
+        <div class="aurow" id="tUpRow" hidden><button class="btn sm primary" id="tUpBtn" type="button">⬆ Tải file audio từ máy lên web</button><input type="file" id="tUpFile" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac,.flac,.webm,.mp4" hidden><span class="count" id="tUpMsg">Bấm nút hoặc kéo thả file mp3 vào khung này. Web tự lưu và tự dò mốc thời gian từng câu; học viên nghe trực tiếp, không cần Drive.</span></div>
+        <label>Hoặc dán link audio (Google Drive, Supabase hoặc link trực tiếp tới file mp3/m4a)<input id="tAudio" placeholder="https://drive.google.com/file/d/…/view" autocomplete="off"></label>
         <div class="aurow"><button class="btn sm" id="tAuTest" type="button">Thử nghe link</button><button class="btn sm" id="tAuClear" type="button">Gỡ audio</button><span class="count" id="tAuMsg"></span></div>
         <audio id="tAuEl" controls preload="metadata"></audio>
         <div id="tMarkBox" hidden>
           <div class="aurow"><button class="btn sm primary" id="tMarkNow" type="button">Đánh dấu đầu câu tiếp theo (phím M)</button><button class="btn sm" id="tMarkAuto" type="button">Dò khoảng lặng tự động</button><button class="btn sm" id="tMarkReset" type="button">Xoá hết mốc</button></div>
           <p class="count" style="margin:0">Bấm Phát ở trên, đến đầu mỗi câu thì bấm “Đánh dấu”. Mỗi dòng là một câu của đoạn văn; bạn có thể sửa số giây bằng tay, bấm ▶ để nghe riêng câu đó, bấm ⌖ để lấy vị trí đang phát.</p>
           <div class="marks" id="tMarks"></div>
+          <div class="aurow"><button class="btn sm" id="tSplitBtn" type="button">✂ Tách audio này thành nhiều bài nghe…</button></div>
+          <div id="tSplitBox" class="splitbox" hidden>
+            <p class="count" style="margin:0">Tick vào câu mà một bài mới bắt đầu. Mỗi bài chỉ phát đúng đoạn audio của nó, dùng chung một file. Cần đã có mốc giây ở đầu mỗi bài.</p>
+            <div class="marks" id="tSplitRows"></div>
+            <div id="tSplitParts" class="splitparts"></div>
+            <div class="aurow"><button class="btn sm primary" id="tSplitGo" type="button">Lưu thành 1 bài</button><span class="count" id="tSplitMsg"></span></div>
+          </div>
         </div>
       </div>
       <div class="row"><button class="btn primary" id="tSave" type="button">Lưu bài</button><button class="btn" id="tNew" type="button">Soạn bài mới</button><span class="count" id="tMsg"></span></div>
@@ -1125,7 +1144,7 @@ $("rates").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.rate=+b.datase
 
 /* ================= audio thật (dùng chung cho mọi chế độ) ================= */
 function driveId(u){ u=String(u||""); if(!/(drive|docs)\.google\.com/.test(u)) return ""; const m=u.match(/\/d\/([\w-]{10,})/)||u.match(/[?&]id=([\w-]{10,})/); return m?m[1]:""; }
-function audioSrc(u){ u=String(u||"").trim(); const id=driveId(u); if(id) return "https://drive.google.com/uc?export=download&id="+id; return /^https?:\/\//i.test(u)?u:""; }
+function audioSrc(u){ u=String(u||"").trim(); const id=driveId(u); if(id) return "https://drive.google.com/uc?export=download&id="+id; if(/^\/_blob\/[\w-]+$/.test(u)) return u; return /^https?:\/\//i.test(u)?u:""; }
 const AU={el:new Audio(),src:"",bad:new Set(),tok:0,iv:0,fail:null,
   ok(){ const a=S.p&&S.p.audio; return !!(a&&a.url&&audioSrc(a.url)&&Array.isArray(a.marks)&&a.marks.length===S.sentences.length&&a.marks.every(x=>typeof x==="number")); },
   has(){ return AU.ok()&&!AU.bad.has(S.p.audio.url); },
@@ -2241,7 +2260,7 @@ $("tAuEl").addEventListener("loadedmetadata",()=>{ const d=$("tAuEl").duration; 
 $("tAuEl").addEventListener("error",()=>{ if($("tAudio").value.trim()) tAuMsg("Không mở được link này. Kiểm tra file đã chia sẻ “Bất kỳ ai có đường liên kết” chưa (thử mở link trong cửa sổ ẩn danh), hoặc dán link khác."); });
 function renderMarks(){
   const sents=tSents(), url=$("tAudio").value.trim(); $("tMarkBox").hidden=!(url&&sents.length);
-  while(tMarks.length<sents.length) tMarks.push(null); tMarks.length=sents.length;
+  while(tMarks.length<sents.length) tMarks.push(null); tMarks.length=sents.length; if(!$("tSplitBox").hidden) setTimeout(renderSplit,0);
   let prev=-1;
   $("tMarks").innerHTML=sents.map((t,i)=>{ const v=tMarks[i], bad=typeof v==="number"&&v<=prev; if(typeof v==="number") prev=v;
     return `<div class="mk"><b>${i+1}</b><span class="mt" title="${esc(t)}">${esc(t)}</span><input type="number" min="0" step="0.05" data-i="${i}" value="${fmtT(v)}" placeholder="giây" class="${bad?"bad":""}" aria-label="Giây bắt đầu câu ${i+1}"><button class="btn sm" data-p="${i}" type="button" aria-label="Nghe câu ${i+1}">▶</button><button class="btn sm" data-g="${i}" type="button" aria-label="Lấy vị trí đang phát cho câu ${i+1}" title="Lấy vị trí đang phát">⌖</button></div>`; }).join("");
@@ -2259,31 +2278,155 @@ function markNow(){ const el=$("tAuEl"); let i=tMarks.findIndex(x=>x===null); if
 $("tMarkNow").onclick=markNow;
 $("tMarkReset").onclick=()=>{ tMarks=tMarks.map(()=>null); tEnd=null; renderMarks(); };
 document.addEventListener("keydown",e=>{ if((e.key==="m"||e.key==="M")&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&$("wrap").dataset.screen==="teacher"&&!$("tMarkBox").hidden&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||""))){ e.preventDefault(); markNow(); } });
+function tMarksFromBuffer(ab){
+  const n=tSents().length; if(n<1) return -1;
+  const ch=ab.getChannelData(0), sr=ab.sampleRate, win=Math.max(1,Math.round(sr*0.02)), nW=Math.floor(ch.length/win), rms=new Float32Array(nW);
+  for(let w=0;w<nW;w++){ let sum=0; const o=w*win; for(let j=0;j<win;j++){ const v=ch[o+j]; sum+=v*v; } rms[w]=Math.sqrt(sum/win); }
+  const sorted=Array.from(rms).sort((a,b)=>a-b), thr=Math.max(1e-4,(sorted[Math.floor(nW*0.95)]||0)*0.08), dt=win/sr;
+  let first=0; while(first<nW&&rms[first]<thr) first++; let last=nW-1; while(last>0&&rms[last]<thr) last--;
+  const sil=[]; let st=-1;
+  for(let w=first;w<=last;w++){ const q=rms[w]<thr; if(q&&st<0) st=w; if(st>=0&&(!q||w===last)){ const en=q?w+1:w; if(en-st>=10) sil.push({s:st*dt,e:en*dt,d:(en-st)*dt}); st=-1; } }
+  const pick=sil.slice().sort((a,b)=>b.d-a.d).slice(0,n-1).sort((a,b)=>a.s-b.s);
+  const marks=[Math.max(0,first*dt-0.1)].concat(pick.map(g=>Math.max(g.s,g.e-0.15)));
+  tMarks=Array.from({length:n},(_,i)=>i<marks.length?Math.round(marks[i]*100)/100:null); tEnd=Math.round(Math.min(ab.duration,(last+1)*dt+0.25)*100)/100; renderMarks();
+  return marks.length;
+}
+const tMarkMsg=(f,n)=>f<n?`Chỉ tìm được ${f}/${n} chỗ ngắt. Bấm ▶ nghe từng câu và điền nốt các mốc còn thiếu.`:"Đã dò xong. Bấm ▶ nghe từng câu và chỉnh lại số giây nếu chưa khớp.";
 $("tMarkAuto").onclick=async()=>{
   const n=tSents().length, src=audioSrc($("tAudio").value); if(!src||n<1) return; tAuMsg("Đang phân tích audio…"); $("tMarkAuto").disabled=true;
   try{
     const buf=await (await fetch(src)).arrayBuffer(); const AC=window.AudioContext||window.webkitAudioContext; const ac=new AC();
     const ab=await ac.decodeAudioData(buf); if(ac.close) ac.close();
-    const ch=ab.getChannelData(0), sr=ab.sampleRate, win=Math.max(1,Math.round(sr*0.02)), nW=Math.floor(ch.length/win), rms=new Float32Array(nW);
-    for(let w=0;w<nW;w++){ let sum=0; const o=w*win; for(let j=0;j<win;j++){ const v=ch[o+j]; sum+=v*v; } rms[w]=Math.sqrt(sum/win); }
-    const sorted=Array.from(rms).sort((a,b)=>a-b), thr=Math.max(1e-4,(sorted[Math.floor(nW*0.95)]||0)*0.08), dt=0.02;
-    let first=0; while(first<nW&&rms[first]<thr) first++; let last=nW-1; while(last>0&&rms[last]<thr) last--;
-    const sil=[]; let st=-1;
-    for(let w=first;w<=last;w++){ const q=rms[w]<thr; if(q&&st<0) st=w; if(st>=0&&(!q||w===last)){ const en=q?w+1:w; if(en-st>=10) sil.push({s:st*dt,e:en*dt,d:(en-st)*dt}); st=-1; } }
-    const pick=sil.slice().sort((a,b)=>b.d-a.d).slice(0,n-1).sort((a,b)=>a.s-b.s);
-    const marks=[Math.max(0,first*dt-0.1)].concat(pick.map(g=>Math.max(g.s,g.e-0.15)));
-    tMarks=Array.from({length:n},(_,i)=>i<marks.length?Math.round(marks[i]*100)/100:null); tEnd=Math.round(Math.min(ab.duration,(last+1)*dt+0.25)*100)/100; renderMarks();
-    tAuMsg(marks.length<n?`Chỉ tìm được ${marks.length}/${n} chỗ ngắt. Bấm ▶ nghe từng câu và điền nốt các mốc còn thiếu.`:"Đã dò xong. Bấm ▶ nghe từng câu và chỉnh lại số giây nếu chưa khớp.");
+    tAuMsg(tMarkMsg(tMarksFromBuffer(ab),n));
   }catch(err){ tAuMsg("Trình duyệt không cho đọc dữ liệu audio từ link này (thường gặp với Drive). Hãy đánh dấu tay: bấm Phát rồi bấm “Đánh dấu” hoặc phím M ở đầu mỗi câu."); }
   $("tMarkAuto").disabled=false;
 };
+
+/* ===== tải file audio lên (assets) → nén Opus/WebM bằng WebCodecs → tự dò mốc câu ===== */
+const wbCat=a=>{ let n=0; a.forEach(x=>n+=x.length); const o=new Uint8Array(n); let k=0; a.forEach(x=>{ o.set(x,k); k+=x.length; }); return o; };
+const wbUint=(n,len)=>{ const o=new Uint8Array(len); for(let i=len-1;i>=0;i--){ o[i]=n%256; n=Math.floor(n/256); } return o; };
+const wbMin=n=>{ let l=1; while(n>=Math.pow(256,l)) l++; return wbUint(n,l); };
+const wbF64=v=>{ const b=new ArrayBuffer(8); new DataView(b).setFloat64(0,v); return new Uint8Array(b); };
+const wbStr=t=>new TextEncoder().encode(t);
+function wbSize(n){ let l=1; while(n>=Math.pow(2,7*l)-1) l++; const o=wbUint(n,l); o[0]|=(1<<(8-l)); return o; }
+function wbEl(id,data){ const ib=[]; let x=id; while(x>0){ ib.unshift(x%256); x=Math.floor(x/256); } return wbCat([Uint8Array.from(ib),wbSize(data.length),data]); }
+function wbMux(chunks,head,durMs,preskip){
+  const ms=c=>Math.round(c.t/1000), cl=[]; let cur=null;
+  chunks.forEach(c=>{ const t=ms(c); if(!cur||t-cur.t0>=2000) { cur={t0:t,b:[]}; cl.push(cur); } const rel=t-cur.t0; cur.b.push(wbEl(0xA3,wbCat([Uint8Array.of(0x81,rel>>8&255,rel&255,0x80),c.d]))); });
+  const clusters=cl.map(c=>wbEl(0x1F43B675,wbCat([wbEl(0xE7,wbMin(c.t0)),...c.b])));
+  const ebml=wbEl(0x1A45DFA3,wbCat([wbEl(0x4286,Uint8Array.of(1)),wbEl(0x42F7,Uint8Array.of(1)),wbEl(0x42F2,Uint8Array.of(4)),wbEl(0x42F3,Uint8Array.of(8)),wbEl(0x4282,wbStr("webm")),wbEl(0x4287,Uint8Array.of(4)),wbEl(0x4285,Uint8Array.of(2))]));
+  const info=wbEl(0x1549A966,wbCat([wbEl(0x2AD7B1,wbMin(1000000)),wbEl(0x4489,wbF64(durMs)),wbEl(0x4D80,wbStr("ListeningLab")),wbEl(0x5741,wbStr("ListeningLab"))]));
+  const tracks=wbEl(0x1654AE6B,wbEl(0xAE,wbCat([wbEl(0xD7,Uint8Array.of(1)),wbEl(0x73C5,Uint8Array.of(1)),wbEl(0x83,Uint8Array.of(2)),wbEl(0x9C,Uint8Array.of(0)),wbEl(0x86,wbStr("A_OPUS")),wbEl(0x56AA,wbMin(Math.round(preskip/48000*1e9))),wbEl(0x56BB,wbMin(80000000)),wbEl(0x63A2,head),wbEl(0xE1,wbCat([wbEl(0xB5,wbF64(48000)),wbEl(0x9F,Uint8Array.of(1))]))])));
+  const mkCues=pos=>wbEl(0x1C53BB6B,wbCat(cl.map((c,i)=>wbEl(0xBB,wbCat([wbEl(0xB3,wbUint(c.t0,4)),wbEl(0xB7,wbCat([wbEl(0xF7,Uint8Array.of(1)),wbEl(0xF1,wbUint(pos[i],4))]))])))));
+  const cl0=cl.map(()=>0), base=info.length+tracks.length+mkCues(cl0).length; let off=base; const pos=clusters.map(c=>{ const o=off; off+=c.length; return o; });
+  return wbCat([ebml,wbEl(0x18538067,wbCat([info,tracks,mkCues(pos),...clusters]))]);
+}
+async function encodeOpusWebm(ab,onp){
+  if(typeof AudioEncoder==="undefined"||typeof AudioData==="undefined") throw {code:"nocodec"};
+  const n=ab.length, L=ab.getChannelData(0), R=ab.numberOfChannels>1?ab.getChannelData(1):null, mono=new Float32Array(n);
+  for(let i=0;i<n;i++) mono[i]=R?(L[i]+R[i])*0.5:L[i];
+  const chunks=[]; let head=null, err=null; const PRE=312;
+  const enc=new AudioEncoder({output:(c,m)=>{ if(!head&&m&&m.decoderConfig&&m.decoderConfig.description){ const d=m.decoderConfig.description; head=new Uint8Array(d.buffer?d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength):d); } const d=new Uint8Array(c.byteLength); c.copyTo(d); chunks.push({t:c.timestamp,d}); },error:e=>{ err=e; }});
+  enc.configure({codec:"opus",sampleRate:48000,numberOfChannels:1,bitrate:48000});
+  const step=48000;
+  for(let o=0;o<n;o+=step){
+    if(err) throw err; const len=Math.min(step,n-o);
+    const ad=new AudioData({format:"f32-planar",sampleRate:48000,numberOfFrames:len,numberOfChannels:1,timestamp:Math.round(o/48000*1e6),data:mono.subarray(o,o+len)});
+    enc.encode(ad); ad.close(); if(onp) onp(Math.round(o/n*100));
+    while(enc.encodeQueueSize>8) await new Promise(r=>setTimeout(r,5));
+  }
+  await enc.flush(); enc.close(); if(err) throw err; if(!chunks.length) throw {code:"nocodec"};
+  if(!head){ head=new Uint8Array(19); head.set(wbStr("OpusHead")); head[8]=1; head[9]=1; head[10]=PRE&255; head[11]=PRE>>8; head[12]=0x80; head[13]=0xBB; }
+  return new Blob([wbMux(chunks,head,n/48000*1000,PRE)],{type:"video/webm"});
+}
+let ASSETS=null;
+function tUpMsg(m){ $("tUpMsg").textContent=m; }
+async function tUpload(file){
+  const btn=$("tUpBtn"); if(!ASSETS||!file) return; btn.disabled=true;
+  try{
+    if(file.size>150*1024*1024){ tUpMsg("File quá lớn (trên 150 MB). Hãy cắt hoặc nén bớt rồi thử lại."); btn.disabled=false; return; }
+    tUpMsg("Đang đọc file…");
+    const AC=window.AudioContext||window.webkitAudioContext, ac=new AC({sampleRate:48000});
+    const ab=await ac.decodeAudioData(await file.arrayBuffer()); if(ac.close) ac.close();
+    const blob=await encodeOpusWebm(ab,p=>tUpMsg("Đang nén audio cho web… "+p+"%"));
+    if(blob.size>19.5*1024*1024) throw {code:"too_large"};
+    tUpMsg("Đang tải lên ("+(blob.size/1048576).toFixed(1)+" MB)…");
+    const r=await ASSETS.upload(blob,{type:"video/webm"});
+    $("tAudio").value="/_blob/"+r.id; tMarks=[]; tEnd=null; tLoadAudio();
+    const n=tSents().length, f=n?tMarksFromBuffer(ab):-1;
+    tUpMsg("Đã tải lên. "+(f<0?"Dán script ở trên rồi bấm “Dò khoảng lặng tự động” để có mốc câu. ":tMarkMsg(f,n)+" ")+"Nhớ bấm Lưu bài.");
+  }catch(e){
+    const c=e&&e.code; tUpMsg(c==="nocodec"?"Trình duyệt này chưa nén được audio. Hãy dùng Chrome hoặc Edge bản mới trên máy tính.":c==="too_large"?"Audio sau khi nén vẫn quá 20 MB. Hãy cắt bớt rồi thử lại.":c==="not_granted"||c==="capability_disabled"?"Tài khoản này chưa có quyền tải file lên trang.":c==="quota_or_state"?"Kho lưu trữ của trang đã đầy.":(e&&e.name==="EncodingError")||(e&&/decode/i.test(String(e.message||"")))?"Không đọc được file này. Thử file mp3, m4a hoặc wav khác.":"Chưa tải lên được, thử lại sau.");
+  }
+  btn.disabled=false; $("tUpFile").value="";
+}
+$("tUpBtn").onclick=()=>$("tUpFile").click();
+{ const bx=$("tAuBox"), hasF=e=>e.dataTransfer&&Array.from(e.dataTransfer.types||[]).includes("Files"); let dc=0;
+  bx.addEventListener("dragenter",e=>{ if(!hasF(e)) return; e.preventDefault(); dc++; bx.classList.add("dropping"); });
+  bx.addEventListener("dragover",e=>{ if(!hasF(e)) return; e.preventDefault(); e.dataTransfer.dropEffect=ASSETS?"copy":"none"; });
+  bx.addEventListener("dragleave",e=>{ if(!hasF(e)) return; dc=Math.max(0,dc-1); if(!dc) bx.classList.remove("dropping"); });
+  bx.addEventListener("drop",e=>{ if(!hasF(e)) return; e.preventDefault(); dc=0; bx.classList.remove("dropping");
+    const f=Array.from(e.dataTransfer.files||[]).find(x=>/^audio\//.test(x.type)||/\.(mp3|m4a|wav|ogg|aac|flac|webm|mp4)$/i.test(x.name));
+    if(!ASSETS){ tUpMsg("Chỉ tài khoản chủ trang (đang đăng nhập) mới tải file lên được."); $("tUpRow").hidden=false; return; }
+    if(!f){ tUpMsg("Hãy thả file âm thanh (mp3, m4a, wav…)."); return; } tUpload(f); }); }
+window.addEventListener("dragover",e=>{ if(e.dataTransfer&&Array.from(e.dataTransfer.types||[]).includes("Files")&&!e.target.closest("#tAuBox")) e.preventDefault(); });
+window.addEventListener("drop",e=>{ if(e.dataTransfer&&Array.from(e.dataTransfer.types||[]).includes("Files")&&!e.target.closest("#tAuBox")) e.preventDefault(); });
+$("tUpFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) tUpload(f); });
+try{ if(window.claude&&window.claude.use) window.claude.use("assets").then(a=>{ ASSETS=a; $("tUpRow").hidden=!a; }).catch(()=>{}); }catch(e){}
+/* ===== tách một audio dài thành nhiều bài ===== */
+let tCuts=new Set(), tPartT=[];
+const fmtMS=x=>typeof x==="number"?Math.floor(x/60)+":"+String(Math.floor(x%60)).padStart(2,"0"):"?";
+function tParts(){ const n=tSents().length, c=[0,...[...tCuts].filter(i=>i>0&&i<n).sort((a,b)=>a-b),n]; return c.slice(0,-1).map((a,k)=>({a,b:c[k+1]})); }
+function renderSplit(){
+  const sents=tSents(), box=$("tSplitBox"); if(box.hidden) return;
+  tCuts=new Set([...tCuts].filter(i=>i>0&&i<sents.length));
+  $("tSplitRows").innerHTML=sents.map((t,i)=>`<label class="sprow${tCuts.has(i)?" cut":""}"><b>${i+1}</b>${i?`<input type="checkbox" data-c="${i}"${tCuts.has(i)?" checked":""} aria-label="Bài mới bắt đầu tại câu ${i+1}">`:"<span></span>"}<span class="mt" title="${esc(t)}">${esc(t)}</span></label>`).join("");
+  const parts=tParts(), base=$("tTitle").value.trim()||"Bài nghe";
+  $("tSplitParts").innerHTML=parts.map((q,k)=>{ const t0=tMarks[q.a], t1=q.b<sents.length?tMarks[q.b]:tEnd; if(tPartT[k]==null) tPartT[k]=base+" – Phần "+(k+1);
+    return `<div class="sppart"><b>Bài ${k+1}</b><input data-t="${k}" value="${esc(tPartT[k])}" aria-label="Tên bài ${k+1}"><small>Câu ${q.a+1}–${q.b} · audio ${fmtMS(t0)}–${t1==null?"hết file":fmtMS(t1)}</small></div>`; }).join("");
+  $("tSplitGo").textContent="Lưu thành "+parts.length+" bài";
+}
+$("tSplitBtn").onclick=()=>{ const b=$("tSplitBox"); b.hidden=!b.hidden; if(!b.hidden){ tPartT=[]; renderSplit(); } };
+$("tSplitRows").addEventListener("change",e=>{ const i=e.target.dataset&&e.target.dataset.c; if(i==null) return; if(e.target.checked) tCuts.add(+i); else tCuts.delete(+i); renderSplit(); });
+$("tSplitParts").addEventListener("input",e=>{ const k=e.target.dataset&&e.target.dataset.t; if(k!=null) tPartT[+k]=e.target.value; });
+$("tSplitGo").onclick=async()=>{
+  const msg=m=>{ $("tSplitMsg").textContent=m; };
+  const sents=tSents(), parts=tParts(), url=$("tAudio").value.trim(), keysAll=[...new Set(lines($("tKeys").value))];
+  if(parts.length<2){ msg("Tick ít nhất một câu để cắt thành bài mới."); return; }
+  if(!audioSrc(url)){ msg("Chưa có audio hợp lệ."); return; }
+  const m=tMarks.map(x=>typeof x==="number"&&isFinite(x)&&x>=0?Math.round(x*100)/100:null), f=m.filter(x=>x!==null);
+  if(f.some((x,i)=>i&&x<=f[i-1])){ msg("Mốc thời gian phải tăng dần, kiểm tra các ô báo đỏ ở trên."); return; }
+  for(let k=0;k<parts.length;k++){ if(m[parts[k].a]==null){ msg(`Bài ${k+1} chưa có mốc giây ở câu ${parts[k].a+1}. Dò tự động hoặc điền tay ở danh sách trên.`); return; } }
+  const out=[], noise=[...new Set(lines($("tNoise").value))], conns=lines($("tConns").value).slice(0,16), id0=editingId;
+  const ex0=id0?gid(id0):null, parent=ex0?(ex0.parent||null):(newParent||null), stamp=Date.now();
+  for(let k=0;k<parts.length;k++){
+    const q=parts[k], text=sents.slice(q.a,q.b).join(" ");
+    if(splitSentences(text).length!==q.b-q.a){ msg(`Bài ${k+1}: không tách câu khớp được, hãy thử cắt ở chỗ khác.`); return; }
+    if(words(text).length<10){ msg(`Bài ${k+1} quá ngắn (cần ít nhất khoảng 10 từ).`); return; }
+    const lo=text.toLowerCase(), keys=keysAll.filter(w=>{ if(!lo.includes(w.toLowerCase())) return false; const first=parts.findIndex(pp=>sents.slice(pp.a,pp.b).join(" ").toLowerCase().includes(w.toLowerCase())); return first===k; });
+    if(keys.length<3){ msg(`Bài ${k+1} chỉ có ${keys.length} từ khoá nằm trong đoạn của nó (cần ít nhất 3). Chọn thêm từ khoá ở phần trên.`); return; }
+    const end=q.b<sents.length?m[q.b]:(tEnd||null);
+    if(q.b<sents.length&&end==null){ msg(`Bài ${k+2} chưa có mốc giây, cần để biết bài ${k+1} dừng ở đâu.`); return; }
+    out.push({id:(k===0&&id0)?id0:("t"+(stamp+k).toString(36)),l:{title:(tPartT[k]||"").trim()||("Phần "+(k+1)),level:$("tLevel").value,skin:$("tSkin").value,text,keys,noise:noise.filter(n=>!keys.includes(n)),conns,teacher:true,updatedAt:stamp,parent,starred:(k===0&&ex0)?!!ex0.starred:false,trashed:null,audio:{url,marks:m.slice(q.a,q.b),end}}});
+  }
+  $("tSplitGo").disabled=true; msg("Đang lưu…");
+  try{
+    if(DB){ for(const o of out) await DB.collection("lessons").doc(o.id).set(o.l); }
+    else { const ids=new Set(out.map(o=>o.id)); const loc=(store.get("dg-lessons")||[]).filter(x=>!ids.has(x.id)); out.slice().reverse().forEach(o=>loc.unshift({id:o.id,...o.l})); store.set("dg-lessons",loc); setLessons(loc); }
+    out.forEach(o=>store.set("dg2-"+o.id,{})); AU.bad.clear();
+    $("tSplitBox").hidden=true; msg(""); editingId=out[0].id; showLib(out[0].id);
+    setTimeout(()=>{ try{ snack(`Đã tạo ${out.length} bài từ một audio.`); }catch(e){} },80);
+  }catch(err){ msg("Chưa lưu được: "+(err&&err.code==="permission_denied"?"bạn không có quyền sửa trang này.":"lỗi kết nối, thử lại sau.")); }
+  $("tSplitGo").disabled=false;
+};
+$("tText").addEventListener("input",()=>{ clearTimeout(renderSplit.t); renderSplit.t=setTimeout(renderSplit,350); });
 $("tClean").onclick=()=>{
   const t=$("tText").value; if(!t.trim()) return;
   const c=t.replace(/^[ \t]*[-–—_=]{3,}[ \t]*$/gm,"").replace(/^[ \t]*[A-Z][A-Z ]{1,24}:[ \t]*/gm,"").replace(/\(\s*(?:Q\s*\d+|Example)\s*\)/gi,"").replace(/[ \t]{2,}/g," ").replace(/ +([,.!?])/g,"$1").replace(/\n{3,}/g,"\n\n").trim();
   $("tText").value=c; $("tText").dispatchEvent(new Event("input",{bubbles:true})); $("tMsg").textContent="Đã làm sạch script. Kiểm tra lại rồi chọn từ khoá ở bên dưới.";
 };
 function lessonAudioState(l){ if(!l.audio||!l.audio.url) return ""; const n=splitSentences(l.text).length, m=l.audio.marks; return Array.isArray(m)&&m.length===n&&m.every(x=>typeof x==="number")?"ok":"warn"; }
-function fillEditor(l){ editingId=l?l.id:null; $("tTitle").value=l?l.title:""; $("tLevel").value=l?l.level:"B1"; $("tSkin").value=(l&&l.skin)||"space"; $("tText").value=l?l.text:""; $("tKeys").value=l?l.keys.join("\n"):""; $("tNoise").value=l?(l.noise||[]).join("\n"):""; $("tConns").value=l?(l.conns||[]).join("\n"):""; $("tMsg").textContent=l?"Đang sửa bài đã lưu.":""; $("tAudio").value=(l&&l.audio&&l.audio.url)||""; tMarks=(l&&l.audio&&Array.isArray(l.audio.marks))?l.audio.marks.slice():[]; tEnd=(l&&l.audio&&l.audio.end)||null; tLoadAudio(); renderPreview(); }
+function fillEditor(l){ editingId=l?l.id:null; $("tTitle").value=l?l.title:""; $("tLevel").value=l?l.level:"B1"; $("tSkin").value=(l&&l.skin)||"space"; $("tText").value=l?l.text:""; $("tKeys").value=l?l.keys.join("\n"):""; $("tNoise").value=l?(l.noise||[]).join("\n"):""; $("tConns").value=l?(l.conns||[]).join("\n"):""; $("tMsg").textContent=l?"Đang sửa bài đã lưu.":""; $("tAudio").value=(l&&l.audio&&l.audio.url)||""; tMarks=(l&&l.audio&&Array.isArray(l.audio.marks))?l.audio.marks.slice():[]; tEnd=(l&&l.audio&&l.audio.end)||null; tCuts=new Set(); tPartT=[]; $("tSplitBox").hidden=true; tLoadAudio(); renderPreview(); }
 $("tNew").onclick=()=>{ newParent=null; fillEditor(null); };
 $("tSave").onclick=async()=>{
   const text=$("tText").value.trim().replace(/\s+/g," "), keys=lines($("tKeys").value);
@@ -2294,7 +2437,7 @@ $("tSave").onclick=async()=>{
   { const ex=gid(id)||null; l.parent=ex?(ex.parent||null):(newParent||null); l.starred=ex?!!ex.starred:false; l.trashed=ex?(ex.trashed||null):null; }
   const aUrl=$("tAudio").value.trim();
   if(aUrl){
-    if(!audioSrc(aUrl)){ $("tMsg").textContent="Link audio cần bắt đầu bằng https://"; return; }
+    if(!audioSrc(aUrl)){ $("tMsg").textContent="Link audio cần bắt đầu bằng https:// (hoặc dùng nút tải file lên)"; return; }
     const ns=tSents().length, m=Array.from({length:ns},(_,i)=>typeof tMarks[i]==="number"&&isFinite(tMarks[i])&&tMarks[i]>=0?Math.round(tMarks[i]*100)/100:null), f=m.filter(x=>x!==null);
     if(f.some((x,i)=>i&&x<=f[i-1])){ $("tMsg").textContent="Mốc thời gian các câu phải tăng dần, kiểm tra các ô báo đỏ."; return; }
     l.audio={url:aUrl,marks:m,end:tEnd||null};
