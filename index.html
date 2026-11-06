@@ -676,6 +676,7 @@ header.top .passages{display:none}
 .mk input.bad{border-color:#d33!important;background:#fff0f0}
 .mk .btn{padding:4px 0;min-width:0}
 .plbanner{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--signal-soft);color:var(--ink)}
+.d-keypanel{margin:0 16px 10px}
 .keybox{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .keybox summary{cursor:pointer;font-weight:700;font-size:13px}
 #plPick{margin-top:4px;align-self:flex-start}
@@ -975,8 +976,20 @@ header.top .passages{display:none}
     <header class="d-top">
       <div class="d-brand"><span id="dMochi"></span><span>Kho bài nghe</span></div>
       <label class="d-search"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input id="dQ" type="search" placeholder="Tìm trong Kho bài" autocomplete="off" aria-label="Tìm trong Kho bài"></label>
-      <div class="d-top-r"><button class="btn" id="dHome" type="button">← Trang chủ</button></div>
+      <div class="d-top-r"><button class="btn" id="dKeyBtn" type="button" aria-expanded="false">⚙ Kết nối Drive <span id="dKeyDot"></span></button><button class="btn" id="dHome" type="button">← Trang chủ</button></div>
     </header>
+    <div class="d-keypanel" id="dKeyPanel" hidden>
+        <div class="keybox" id="tKeyBox"><b>Kết nối Google Drive (khoá API)</b> <span class="count" id="tKeyState"></span>
+          <ol class="count" style="margin:6px 0;padding-left:20px;line-height:1.7">
+            <li>Vào console.cloud.google.com, đăng nhập Gmail, tạo một Project mới (tên tuỳ ý).</li>
+            <li>Menu “APIs &amp; Services” → “Library” → tìm “Google Drive API” → bấm Enable.</li>
+            <li>“Credentials” → “Create credentials” → “API key”, rồi bấm Copy.</li>
+            <li>Bấm vào khoá vừa tạo → “API restrictions” → chọn “Restrict key” → tick “Google Drive API” → Save.</li>
+            <li>Dán khoá vào ô dưới, bấm Lưu khoá. File Drive cần để chia sẻ “Bất kỳ ai có đường liên kết”.</li>
+          </ol>
+          <div class="aurow"><input id="tKey" placeholder="AIza…" autocomplete="off" spellcheck="false" style="flex:1;min-width:200px"><button class="btn sm" id="tKeySave" type="button">Lưu khoá</button><span class="count" id="tKeyMsg"></span></div>
+        </div>
+    </div>
     <div class="d-body">
       <aside class="d-side"><button class="d-new" id="dNew" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Mới</span></button><nav id="dNav" aria-label="Điều hướng kho bài"></nav><div class="d-store" id="dStore"></div></aside>
       <main class="d-main">
@@ -1024,16 +1037,6 @@ header.top .passages{display:none}
         <div class="aurow"><button class="btn sm primary" id="tLocBtn" type="button">📁 Chọn file từ máy (không tải lên web)</button><input type="file" id="tLocFile" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac,.flac" hidden><span class="count" id="tUpMsg">Để nghe thử và tự dò mốc từng câu. Kéo thả file vào khung này cũng được.</span></div>
         <label>Link audio (Google Drive hoặc link trực tiếp tới file mp3/m4a). Để trống nếu học viên tự chọn file từ máy<input id="tAudio" placeholder="https://drive.google.com/file/d/…/view" autocomplete="off"></label>
         <div class="aurow"><button class="btn sm" id="tAuTest" type="button">Thử nghe link</button><button class="btn sm" id="tAuClear" type="button">Gỡ audio</button><span class="count" id="tAuMsg"></span></div>
-        <details class="keybox" id="tKeyBox"><summary>Kết nối Google Drive (khoá API) <span class="count" id="tKeyState"></span></summary>
-          <ol class="count" style="margin:6px 0;padding-left:20px;line-height:1.7">
-            <li>Vào console.cloud.google.com, đăng nhập Gmail, tạo một Project mới (tên tuỳ ý).</li>
-            <li>Menu “APIs &amp; Services” → “Library” → tìm “Google Drive API” → bấm Enable.</li>
-            <li>“Credentials” → “Create credentials” → “API key”, rồi bấm Copy.</li>
-            <li>Bấm vào khoá vừa tạo → “API restrictions” → chọn “Restrict key” → tick “Google Drive API” → Save.</li>
-            <li>Dán khoá vào ô dưới, bấm Lưu khoá. File Drive cần để chia sẻ “Bất kỳ ai có đường liên kết”.</li>
-          </ol>
-          <div class="aurow"><input id="tKey" placeholder="AIza…" autocomplete="off" spellcheck="false" style="flex:1;min-width:200px"><button class="btn sm" id="tKeySave" type="button">Lưu khoá</button><span class="count" id="tKeyMsg"></span></div>
-        </details>
         <audio id="tAuEl" controls preload="metadata"></audio>
         <div id="tMarkBox" hidden>
           <div class="aurow"><button class="btn sm primary" id="tMarkNow" type="button">Đánh dấu đầu câu tiếp theo (phím M)</button><button class="btn sm" id="tMarkAuto" type="button">Dò khoảng lặng tự động</button><button class="btn sm" id="tMarkReset" type="button">Xoá hết mốc</button></div>
@@ -2366,7 +2369,8 @@ $("tLocFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.fi
     if(!f){ tUpMsg("Hãy thả file âm thanh (mp3, m4a, wav…)."); return; } tPickLocal(f); }); }
 window.addEventListener("dragover",e=>{ if(e.dataTransfer&&Array.from(e.dataTransfer.types||[]).includes("Files")&&!e.target.closest("#tAuBox")) e.preventDefault(); });
 window.addEventListener("drop",e=>{ if(e.dataTransfer&&Array.from(e.dataTransfer.types||[]).includes("Files")&&!e.target.closest("#tAuBox")) e.preventDefault(); });
-function keyUI(){ $("tKey").value=DRIVEKEY; $("tKeyState").textContent=DRIVEKEY?"· đã kết nối":"· chưa kết nối"; }
+function keyUI(){ $("tKey").value=DRIVEKEY; $("tKeyState").textContent=DRIVEKEY?"· đã kết nối":"· chưa kết nối"; $("dKeyDot").textContent=DRIVEKEY?"✓":""; }
+$("dKeyBtn").onclick=()=>{ const pn=$("dKeyPanel"); pn.hidden=!pn.hidden; $("dKeyBtn").setAttribute("aria-expanded",String(!pn.hidden)); };
 $("tKeySave").onclick=async()=>{
   const k=$("tKey").value.trim(), m=t=>{ $("tKeyMsg").textContent=t; };
   if(k&&!/^AIza[\w-]{30,}$/.test(k)){ m("Khoá thường bắt đầu bằng AIza và dài khoảng 39 ký tự. Kiểm tra lại."); return; }
