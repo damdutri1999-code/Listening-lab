@@ -2429,13 +2429,17 @@ $("tSplitGo").onclick=async()=>{
   $("tSplitGo").disabled=false;
 };
 $("tText").addEventListener("input",()=>{ clearTimeout(renderSplit.t); renderSplit.t=setTimeout(renderSplit,350); });
+/* tự xuống dòng theo người nói (OFFICIAL:, WOMAN:, STUDENT 1:…) và đường gạch ngang */
+function breakSpeakers(t){ return String(t).replace(/[ \t]*(-{4,})[ \t]*/g,"\n\n$1\n\n").replace(/([^\n])[ \t]+(?=[A-Z]{2,}(?: [A-Z0-9]+){0,2}[ \t]*:(?!\d))/g,"$1\n\n").replace(/\n{3,}/g,"\n\n"); }
+$("tText").addEventListener("paste",e=>{ const t=(e.clipboardData||window.clipboardData).getData("text"); if(!t) return; const b=breakSpeakers(t); if(b===t) return; e.preventDefault(); const el=e.target, a=el.selectionStart, z=el.selectionEnd; el.value=el.value.slice(0,a)+b+el.value.slice(z); el.selectionStart=el.selectionEnd=a+b.length; el.dispatchEvent(new Event("input",{bubbles:true})); });
+$("tText").addEventListener("change",()=>{ const v=$("tText").value, b=breakSpeakers(v); if(b!==v){ $("tText").value=b; $("tText").dispatchEvent(new Event("input",{bubbles:true})); } });
 $("tClean").onclick=()=>{
-  const t=$("tText").value; if(!t.trim()) return;
+  const t=breakSpeakers($("tText").value); if(!t.trim()) return;
   const c=t.replace(/^[ \t]*[-–—_=]{3,}[ \t]*$/gm,"").replace(/^[ \t]*[A-Z][A-Z ]{1,24}:[ \t]*/gm,"").replace(/\(\s*(?:Q\s*\d+|Example)\s*\)/gi,"").replace(/[ \t]{2,}/g," ").replace(/ +([,.!?])/g,"$1").replace(/\n{3,}/g,"\n\n").trim();
   $("tText").value=c; $("tText").dispatchEvent(new Event("input",{bubbles:true})); $("tMsg").textContent="Đã làm sạch script. Kiểm tra lại rồi chọn từ khoá ở bên dưới.";
 };
 function lessonAudioState(l){ if(!l.audio||!l.audio.url) return ""; const n=splitSentences(l.text).length, m=l.audio.marks; return Array.isArray(m)&&m.length===n&&m.every(x=>typeof x==="number")?"ok":"warn"; }
-function fillEditor(l){ editingId=l?l.id:null; $("tTitle").value=l?l.title:""; $("tLevel").value=l?l.level:"B1"; $("tSkin").value=(l&&l.skin)||"space"; $("tText").value=l?l.text:""; $("tKeys").value=l?l.keys.join("\n"):""; $("tNoise").value=l?(l.noise||[]).join("\n"):""; $("tConns").value=l?(l.conns||[]).join("\n"):""; $("tMsg").textContent=l?"Đang sửa bài đã lưu.":""; $("tAudio").value=(l&&l.audio&&l.audio.url)||""; tMarks=(l&&l.audio&&Array.isArray(l.audio.marks))?l.audio.marks.slice():[]; tEnd=(l&&l.audio&&l.audio.end)||null; tName=(l&&l.audio&&l.audio.name)||""; tDur=(l&&l.audio&&l.audio.dur)||null; tCuts=new Set(); tPartT=[]; $("tSplitBox").hidden=true; tLoadAudio(); renderPreview(); }
+function fillEditor(l){ editingId=l?l.id:null; $("tTitle").value=l?l.title:""; $("tLevel").value=l?l.level:"B1"; $("tSkin").value=(l&&l.skin)||"space"; $("tText").value=l?breakSpeakers(l.text):""; $("tKeys").value=l?l.keys.join("\n"):""; $("tNoise").value=l?(l.noise||[]).join("\n"):""; $("tConns").value=l?(l.conns||[]).join("\n"):""; $("tMsg").textContent=l?"Đang sửa bài đã lưu.":""; $("tAudio").value=(l&&l.audio&&l.audio.url)||""; tMarks=(l&&l.audio&&Array.isArray(l.audio.marks))?l.audio.marks.slice():[]; tEnd=(l&&l.audio&&l.audio.end)||null; tName=(l&&l.audio&&l.audio.name)||""; tDur=(l&&l.audio&&l.audio.dur)||null; tCuts=new Set(); tPartT=[]; $("tSplitBox").hidden=true; tLoadAudio(); renderPreview(); }
 $("tNew").onclick=()=>{ newParent=null; fillEditor(null); };
 $("tSave").onclick=async()=>{
   const text=$("tText").value.trim().replace(/\s+/g," "), keys=lines($("tKeys").value);
