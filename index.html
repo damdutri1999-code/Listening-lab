@@ -675,6 +675,10 @@ header.top .passages{display:none}
 .mk input{padding:5px 6px!important;font-size:13px!important}
 .mk input.bad{border-color:#d33!important;background:#fff0f0}
 .mk .btn{padding:4px 0;min-width:0}
+.plbanner{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--signal-soft);color:var(--ink)}
+.keybox{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.keybox summary{cursor:pointer;font-weight:700;font-size:13px}
+#plPick{margin-top:4px;align-self:flex-start}
 .splitbox{display:flex;flex-direction:column;gap:8px;border-top:1.5px dashed var(--line);padding-top:10px}
 .teach label.sprow,.sprow{display:grid;flex-direction:initial;font-weight:500;cursor:pointer;grid-template-columns:26px 22px minmax(0,1fr);gap:6px;align-items:center;font-size:13px}
 .sprow.cut{background:var(--signal-soft);border-radius:6px}
@@ -774,6 +778,7 @@ header.top .passages{display:none}
 
   <section class="panel" id="scriptPanel" aria-labelledby="sc-h">
     <div class="panel-head"><h2 id="sc-h">Script bài nghe</h2><span class="count" id="scInfo"></span></div>
+    <div class="hint plbanner" id="plBanner" hidden><span id="plBanText">Bài này dùng file audio riêng của giáo viên.</span> <button class="btn sm primary" id="plPick2" type="button">🎧 Chọn file audio từ máy</button></div>
     <p class="hint" id="scHint">Đọc kỹ cả đoạn. Bấm vào bất kỳ từ nào để tra nghĩa hoặc nghe phát âm.</p>
     <div class="script" id="scriptText"></div>
     <div class="readywrap" id="readyWrap1">
@@ -786,7 +791,7 @@ header.top .passages{display:none}
   <section class="panel" id="playerPanel" aria-labelledby="pl-h">
     <div class="player-row">
       <button class="play" id="playBtn" aria-label="Phát"><svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></button>
-      <div class="meta"><span class="label" id="plLevel">B1</span><strong id="pl-h">Bài nghe</strong><small id="plInfo"></small></div>
+      <div class="meta"><span class="label" id="plLevel">B1</span><strong id="pl-h">Bài nghe</strong><small id="plInfo"></small><button class="btn sm" id="plPick" type="button" hidden>🎧 Chọn file audio từ máy</button></div>
       <div class="track" id="track" aria-label="Tiến trình theo câu"></div>
       <div class="plays"><span>Đã nghe</span><div class="dots" id="dots"></div><span id="playsN" style="font-family:var(--f-mono)">0</span></div>
       <button class="btn" id="restart">Nghe lại từ đầu</button>
@@ -938,7 +943,7 @@ header.top .passages{display:none}
           <button class="play" id="dtPlay" aria-label="Nghe câu này"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></button>
           <div class="seg-toggle dark" id="dtRates"><button data-r="0.7" aria-pressed="false">Chậm</button><button data-r="0.95" aria-pressed="true">Thường</button></div>
           <select id="dtVoice" aria-label="Chọn giọng đọc"></select>
-          <span class="dtplays" id="dtPlays">Đã nghe 0 lần</span>
+          <span class="dtplays" id="dtPlays">Đã nghe 0 lần</span><button class="btn sm dk" id="dtPick" type="button" hidden>🎧 Chọn file audio từ máy</button><input type="file" id="plFile" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac,.flac" hidden>
         </div>
         <div class="dtrep" id="dtRep">
           <div class="dtgrp"><span class="dtgl">Lặp câu</span>
@@ -1016,9 +1021,19 @@ header.top .passages{display:none}
       <div><div class="label" style="margin-bottom:6px">Xem trước rổ từ và khay từ nối</div><div class="pv" id="tPreview"><em>Từ khoá sẽ hiện ở đây.</em></div></div>
       <div class="aubox" id="tAuBox">
         <div class="label">Audio của bài <span class="count">· dùng chung cho mọi chế độ luyện nghe (không bắt buộc, để trống thì dùng giọng đọc máy)</span></div>
-        <div class="aurow" id="tUpRow" hidden><button class="btn sm primary" id="tUpBtn" type="button">⬆ Tải file audio từ máy lên web</button><input type="file" id="tUpFile" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac,.flac,.webm,.mp4" hidden><span class="count" id="tUpMsg">Bấm nút hoặc kéo thả file mp3 vào khung này. Web tự lưu và tự dò mốc thời gian từng câu; học viên nghe trực tiếp, không cần Drive.</span></div>
-        <label>Hoặc dán link audio (Google Drive, Supabase hoặc link trực tiếp tới file mp3/m4a)<input id="tAudio" placeholder="https://drive.google.com/file/d/…/view" autocomplete="off"></label>
+        <div class="aurow"><button class="btn sm primary" id="tLocBtn" type="button">📁 Chọn file từ máy (không tải lên web)</button><input type="file" id="tLocFile" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac,.flac" hidden><span class="count" id="tUpMsg">Để nghe thử và tự dò mốc từng câu. Kéo thả file vào khung này cũng được.</span></div>
+        <label>Link audio (Google Drive hoặc link trực tiếp tới file mp3/m4a). Để trống nếu học viên tự chọn file từ máy<input id="tAudio" placeholder="https://drive.google.com/file/d/…/view" autocomplete="off"></label>
         <div class="aurow"><button class="btn sm" id="tAuTest" type="button">Thử nghe link</button><button class="btn sm" id="tAuClear" type="button">Gỡ audio</button><span class="count" id="tAuMsg"></span></div>
+        <details class="keybox" id="tKeyBox"><summary>Kết nối Google Drive (khoá API) <span class="count" id="tKeyState"></span></summary>
+          <ol class="count" style="margin:6px 0;padding-left:20px;line-height:1.7">
+            <li>Vào console.cloud.google.com, đăng nhập Gmail, tạo một Project mới (tên tuỳ ý).</li>
+            <li>Menu “APIs &amp; Services” → “Library” → tìm “Google Drive API” → bấm Enable.</li>
+            <li>“Credentials” → “Create credentials” → “API key”, rồi bấm Copy.</li>
+            <li>Bấm vào khoá vừa tạo → “API restrictions” → chọn “Restrict key” → tick “Google Drive API” → Save.</li>
+            <li>Dán khoá vào ô dưới, bấm Lưu khoá. File Drive cần để chia sẻ “Bất kỳ ai có đường liên kết”.</li>
+          </ol>
+          <div class="aurow"><input id="tKey" placeholder="AIza…" autocomplete="off" spellcheck="false" style="flex:1;min-width:200px"><button class="btn sm" id="tKeySave" type="button">Lưu khoá</button><span class="count" id="tKeyMsg"></span></div>
+        </details>
         <audio id="tAuEl" controls preload="metadata"></audio>
         <div id="tMarkBox" hidden>
           <div class="aurow"><button class="btn sm primary" id="tMarkNow" type="button">Đánh dấu đầu câu tiếp theo (phím M)</button><button class="btn sm" id="tMarkAuto" type="button">Dò khoảng lặng tự động</button><button class="btn sm" id="tMarkReset" type="button">Xoá hết mốc</button></div>
@@ -1144,13 +1159,32 @@ $("rates").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.rate=+b.datase
 
 /* ================= audio thật (dùng chung cho mọi chế độ) ================= */
 function driveId(u){ u=String(u||""); if(!/(drive|docs)\.google\.com/.test(u)) return ""; const m=u.match(/\/d\/([\w-]{10,})/)||u.match(/[?&]id=([\w-]{10,})/); return m?m[1]:""; }
-function audioSrc(u){ u=String(u||"").trim(); const id=driveId(u); if(id) return "https://drive.google.com/uc?export=download&id="+id; if(/^\/_blob\/[\w-]+$/.test(u)) return u; return /^https?:\/\//i.test(u)?u:""; }
+const LOCALAUDIO={}; let DRIVEKEY=""; try{ DRIVEKEY=(window.localStorage&&localStorage.getItem("dg-drivekey"))||""; }catch(e){}
+const isLocalRef=u=>/^local:/.test(String(u||"").trim());
+function audioSrc(u){ u=String(u||"").trim(); if(LOCALAUDIO[u]) return LOCALAUDIO[u]; const id=driveId(u); if(id) return DRIVEKEY?"https://www.googleapis.com/drive/v3/files/"+id+"?alt=media&key="+encodeURIComponent(DRIVEKEY):"https://drive.google.com/uc?export=download&id="+id; return /^https?:\/\//i.test(u)?u:""; }
+function idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open("ll-audio",1); r.onupgradeneeded=()=>r.result.createObjectStore("f"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function idbPut(k,v){ try{ const d=await idb(); d.transaction("f","readwrite").objectStore("f").put(v,k); }catch(e){} }
+async function idbGet(k){ try{ const d=await idb(); return await new Promise(res=>{ const q=d.transaction("f").objectStore("f").get(k); q.onsuccess=()=>res(q.result||null); q.onerror=()=>res(null); }); }catch(e){ return null; } }
+function fileDur(file){ return new Promise(res=>{ const u=URL.createObjectURL(file), a=new Audio(); a.preload="metadata"; const done=v=>{ URL.revokeObjectURL(u); res(v); }; a.onloadedmetadata=()=>done(isFinite(a.duration)?a.duration:0); a.onerror=()=>done(0); setTimeout(()=>done(0),8000); a.src=u; }); }
+const fmtMS=x=>typeof x==="number"?Math.floor(x/60)+":"+String(Math.floor(x%60)).padStart(2,"0"):"?";
+const restoreTried=new Set();
+function restoreLocal(url){ if(!url||LOCALAUDIO[url]||restoreTried.has(url)) return; restoreTried.add(url); idbGet(url).then(f=>{ if(f&&!LOCALAUDIO[url]){ LOCALAUDIO[url]=URL.createObjectURL(f); AU.bad.delete(url); AU.src=""; if(S.p&&S.p.audio&&S.p.audio.url===url) updatePlInfo(); } }); }
+async function useLocalFile(file){
+  const a=S.p&&S.p.audio; if(!a||!a.url||!file) return;
+  const dur=await fileDur(file), put=m=>{ if($("hint")) $("hint").textContent=m; if($("dtMsg")) $("dtMsg").textContent=m; };
+  if(!dur){ put("Không đọc được file này. Hãy chọn file mp3, m4a hoặc wav."); return; }
+  if(a.dur&&Math.abs(dur-a.dur)>3){ put(`File này dài ${fmtMS(dur)} nhưng bài cần file dài khoảng ${fmtMS(a.dur)}. Có vẻ là file khác, hãy chọn đúng file giáo viên gửi.`); return; }
+  if(LOCALAUDIO[a.url]) URL.revokeObjectURL(LOCALAUDIO[a.url]);
+  LOCALAUDIO[a.url]=URL.createObjectURL(file); idbPut(a.url,file); AU.bad.delete(a.url); AU.src=""; updatePlInfo();
+  put("Đã dùng file "+file.name+". Bấm ▶ để nghe. Lần sau máy này sẽ tự nhớ file.");
+}
+
 const AU={el:new Audio(),src:"",bad:new Set(),tok:0,iv:0,fail:null,
   ok(){ const a=S.p&&S.p.audio; return !!(a&&a.url&&audioSrc(a.url)&&Array.isArray(a.marks)&&a.marks.length===S.sentences.length&&a.marks.every(x=>typeof x==="number")); },
   has(){ return AU.ok()&&!AU.bad.has(S.p.audio.url); },
   prep(){ const s=audioSrc(S.p.audio.url); if(AU.src!==s){ AU.src=s; AU.el.preload="auto"; AU.el.src=s; AU.el.load(); } },
   stop(){ AU.tok++; clearInterval(AU.iv); AU.fail=null; try{ AU.el.pause(); }catch(e){} },
-  noteFail(){ const m="Không phát được audio của bài này nên đang dùng giọng đọc máy tạm thời. Thầy có thể sửa link ở Khu vực giáo viên."; if($("hint")) $("hint").textContent=m; if($("dtMsg")) $("dtMsg").textContent=m; },
+  noteFail(){ const m="Không phát được audio từ link của bài này nên đang dùng giọng đọc máy tạm thời. Bấm “Chọn file audio từ máy” để dùng file giáo viên gửi."; if($("hint")) $("hint").textContent=m; if($("dtMsg")) $("dtMsg").textContent=m; },
   playSeg(i,rate,onend,onfail){
     AU.stop(); const tok=AU.tok, a=S.p.audio, el=AU.el;
     const start=a.marks[i], end=i+1<a.marks.length?a.marks[i+1]:(a.end>start?a.end:Infinity);
@@ -1170,10 +1204,14 @@ const AU={el:new Audio(),src:"",bad:new Set(),tok:0,iv:0,fail:null,
 AU.el.addEventListener("error",()=>{ if(AU.fail) AU.fail(); else if(S.p&&S.p.audio&&audioSrc(S.p.audio.url)===AU.src){ AU.bad.add(S.p.audio.url); updatePlInfo(); } });
 function updatePlInfo(){
   if(!S.p) return; const a=S.p.audio, has=AU.has();
-  $("plInfo").textContent=`${S.sentences.length} câu · ${words(S.p.text).length} từ`+(a&&a.url?(has?" · audio thật":AU.bad.has(a.url)?" · audio lỗi, dùng giọng máy":" · giọng máy"):"");
+  const comp=!!(a&&a.url&&Array.isArray(a.marks)&&a.marks.length===S.sentences.length&&a.marks.every(x=>typeof x==="number")); if(comp) restoreLocal(a.url);
+  const need=comp&&!has; $("plPick").hidden=!need; $("dtPick").hidden=!need; $("plBanner").hidden=!need; if(need) $("plBanText").textContent=a.name?`Bài này nghe bằng file “${a.name}” (giáo viên đã gửi). Chọn file đó từ máy để nghe đúng giọng thật.`:"Bài này nghe bằng file audio giáo viên đã gửi. Chọn file đó từ máy để nghe đúng giọng thật.";
+  $("plInfo").textContent=`${S.sentences.length} câu · ${words(S.p.text).length} từ`+(a&&a.url?(has?" · audio thật":isLocalRef(a.url)?" · cần chọn file audio từ máy":AU.bad.has(a.url)?" · audio lỗi, dùng giọng máy":" · giọng máy"):"");
   $("voice").disabled=has; $("dtVoice").disabled=has;
   $("voice").title=$("dtVoice").title=has?"Bài này dùng audio thật nên không cần chọn giọng máy":"";
 }
+$("plPick").onclick=$("dtPick").onclick=$("plPick2").onclick=()=>$("plFile").click();
+$("plFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=""; if(f) useLocalFile(f); });
 function setRate(r){ S.rate=r; $("rates").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.r===r)); }
 function speak(i,single){
   clearTimeout(S.timer);
@@ -2250,14 +2288,14 @@ function tAuMsg(m){ $("tAuMsg").textContent=m||""; }
 function tLoadAudio(){
   const url=$("tAudio").value.trim(), src=audioSrc(url), el=$("tAuEl");
   if(!url){ el.removeAttribute("src"); el.load(); tAuMsg(""); renderMarks(); return; }
-  if(!src){ tAuMsg("Link cần bắt đầu bằng https://"); renderMarks(); return; }
+  if(!src){ tAuMsg(isLocalRef(url)?"Bài này dùng file từ máy. Bấm “Chọn file từ máy” để nghe thử và canh mốc.":"Link cần bắt đầu bằng https://"); renderMarks(); return; }
   tAuMsg("Đang tải…"); el.src=src; el.load(); renderMarks();
 }
 $("tAudio").addEventListener("input",()=>{ clearTimeout(tLoadAudio.t); tLoadAudio.t=setTimeout(tLoadAudio,700); });
 $("tAuTest").onclick=tLoadAudio;
 $("tAuClear").onclick=()=>{ $("tAudio").value=""; tMarks=[]; tEnd=null; tLoadAudio(); };
-$("tAuEl").addEventListener("loadedmetadata",()=>{ const d=$("tAuEl").duration; tAuMsg(isFinite(d)?`Nghe được. Dài ${Math.floor(d/60)}:${String(Math.floor(d%60)).padStart(2,"0")}.`:"Nghe được."); AU.bad.clear(); });
-$("tAuEl").addEventListener("error",()=>{ if($("tAudio").value.trim()) tAuMsg("Không mở được link này. Kiểm tra file đã chia sẻ “Bất kỳ ai có đường liên kết” chưa (thử mở link trong cửa sổ ẩn danh), hoặc dán link khác."); });
+$("tAuEl").addEventListener("loadedmetadata",()=>{ const d=$("tAuEl").duration; if(isFinite(d)) tDur=d; tAuMsg(isFinite(d)?`Nghe được. Dài ${Math.floor(d/60)}:${String(Math.floor(d%60)).padStart(2,"0")}.`:"Nghe được."); AU.bad.clear(); });
+$("tAuEl").addEventListener("error",()=>{ if($("tAudio").value.trim()) tAuMsg(driveId($("tAudio").value)&&!DRIVEKEY?"Link Drive cần kết nối khoá API (mục “Kết nối Google Drive” bên dưới), hoặc bấm “Chọn file từ máy”.":"Không mở được link này. Kiểm tra file đã chia sẻ “Bất kỳ ai có đường liên kết” chưa (thử mở link trong cửa sổ ẩn danh), hoặc dán link khác."); });
 function renderMarks(){
   const sents=tSents(), url=$("tAudio").value.trim(); $("tMarkBox").hidden=!(url&&sents.length);
   while(tMarks.length<sents.length) tMarks.push(null); tMarks.length=sents.length; if(!$("tSplitBox").hidden) setTimeout(renderSplit,0);
@@ -2302,80 +2340,47 @@ $("tMarkAuto").onclick=async()=>{
   $("tMarkAuto").disabled=false;
 };
 
-/* ===== tải file audio lên (assets) → nén Opus/WebM bằng WebCodecs → tự dò mốc câu ===== */
-const wbCat=a=>{ let n=0; a.forEach(x=>n+=x.length); const o=new Uint8Array(n); let k=0; a.forEach(x=>{ o.set(x,k); k+=x.length; }); return o; };
-const wbUint=(n,len)=>{ const o=new Uint8Array(len); for(let i=len-1;i>=0;i--){ o[i]=n%256; n=Math.floor(n/256); } return o; };
-const wbMin=n=>{ let l=1; while(n>=Math.pow(256,l)) l++; return wbUint(n,l); };
-const wbF64=v=>{ const b=new ArrayBuffer(8); new DataView(b).setFloat64(0,v); return new Uint8Array(b); };
-const wbStr=t=>new TextEncoder().encode(t);
-function wbSize(n){ let l=1; while(n>=Math.pow(2,7*l)-1) l++; const o=wbUint(n,l); o[0]|=(1<<(8-l)); return o; }
-function wbEl(id,data){ const ib=[]; let x=id; while(x>0){ ib.unshift(x%256); x=Math.floor(x/256); } return wbCat([Uint8Array.from(ib),wbSize(data.length),data]); }
-function wbMux(chunks,head,durMs,preskip){
-  const ms=c=>Math.round(c.t/1000), cl=[]; let cur=null;
-  chunks.forEach(c=>{ const t=ms(c); if(!cur||t-cur.t0>=2000) { cur={t0:t,b:[]}; cl.push(cur); } const rel=t-cur.t0; cur.b.push(wbEl(0xA3,wbCat([Uint8Array.of(0x81,rel>>8&255,rel&255,0x80),c.d]))); });
-  const clusters=cl.map(c=>wbEl(0x1F43B675,wbCat([wbEl(0xE7,wbMin(c.t0)),...c.b])));
-  const ebml=wbEl(0x1A45DFA3,wbCat([wbEl(0x4286,Uint8Array.of(1)),wbEl(0x42F7,Uint8Array.of(1)),wbEl(0x42F2,Uint8Array.of(4)),wbEl(0x42F3,Uint8Array.of(8)),wbEl(0x4282,wbStr("webm")),wbEl(0x4287,Uint8Array.of(4)),wbEl(0x4285,Uint8Array.of(2))]));
-  const info=wbEl(0x1549A966,wbCat([wbEl(0x2AD7B1,wbMin(1000000)),wbEl(0x4489,wbF64(durMs)),wbEl(0x4D80,wbStr("ListeningLab")),wbEl(0x5741,wbStr("ListeningLab"))]));
-  const tracks=wbEl(0x1654AE6B,wbEl(0xAE,wbCat([wbEl(0xD7,Uint8Array.of(1)),wbEl(0x73C5,Uint8Array.of(1)),wbEl(0x83,Uint8Array.of(2)),wbEl(0x9C,Uint8Array.of(0)),wbEl(0x86,wbStr("A_OPUS")),wbEl(0x56AA,wbMin(Math.round(preskip/48000*1e9))),wbEl(0x56BB,wbMin(80000000)),wbEl(0x63A2,head),wbEl(0xE1,wbCat([wbEl(0xB5,wbF64(48000)),wbEl(0x9F,Uint8Array.of(1))]))])));
-  const mkCues=pos=>wbEl(0x1C53BB6B,wbCat(cl.map((c,i)=>wbEl(0xBB,wbCat([wbEl(0xB3,wbUint(c.t0,4)),wbEl(0xB7,wbCat([wbEl(0xF7,Uint8Array.of(1)),wbEl(0xF1,wbUint(pos[i],4))]))])))));
-  const cl0=cl.map(()=>0), base=info.length+tracks.length+mkCues(cl0).length; let off=base; const pos=clusters.map(c=>{ const o=off; off+=c.length; return o; });
-  return wbCat([ebml,wbEl(0x18538067,wbCat([info,tracks,mkCues(pos),...clusters]))]);
-}
-async function encodeOpusWebm(ab,onp){
-  if(typeof AudioEncoder==="undefined"||typeof AudioData==="undefined") throw {code:"nocodec"};
-  const n=ab.length, L=ab.getChannelData(0), R=ab.numberOfChannels>1?ab.getChannelData(1):null, mono=new Float32Array(n);
-  for(let i=0;i<n;i++) mono[i]=R?(L[i]+R[i])*0.5:L[i];
-  const chunks=[]; let head=null, err=null; const PRE=312;
-  const enc=new AudioEncoder({output:(c,m)=>{ if(!head&&m&&m.decoderConfig&&m.decoderConfig.description){ const d=m.decoderConfig.description; head=new Uint8Array(d.buffer?d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength):d); } const d=new Uint8Array(c.byteLength); c.copyTo(d); chunks.push({t:c.timestamp,d}); },error:e=>{ err=e; }});
-  enc.configure({codec:"opus",sampleRate:48000,numberOfChannels:1,bitrate:48000});
-  const step=48000;
-  for(let o=0;o<n;o+=step){
-    if(err) throw err; const len=Math.min(step,n-o);
-    const ad=new AudioData({format:"f32-planar",sampleRate:48000,numberOfFrames:len,numberOfChannels:1,timestamp:Math.round(o/48000*1e6),data:mono.subarray(o,o+len)});
-    enc.encode(ad); ad.close(); if(onp) onp(Math.round(o/n*100));
-    while(enc.encodeQueueSize>8) await new Promise(r=>setTimeout(r,5));
-  }
-  await enc.flush(); enc.close(); if(err) throw err; if(!chunks.length) throw {code:"nocodec"};
-  if(!head){ head=new Uint8Array(19); head.set(wbStr("OpusHead")); head[8]=1; head[9]=1; head[10]=PRE&255; head[11]=PRE>>8; head[12]=0x80; head[13]=0xBB; }
-  return new Blob([wbMux(chunks,head,n/48000*1000,PRE)],{type:"video/webm"});
-}
-let ASSETS=null;
+/* ===== chọn file từ máy (không tải lên) + khoá API Drive ===== */
+let tName="", tDur=null;
 function tUpMsg(m){ $("tUpMsg").textContent=m; }
-async function tUpload(file){
-  const btn=$("tUpBtn"); if(!ASSETS||!file) return; btn.disabled=true;
+async function tPickLocal(file){
+  if(!file) return; const cur=$("tAudio").value.trim(); let key=cur;
+  if(!cur||isLocalRef(cur)){ key="local:"+file.name; $("tAudio").value=key; }
+  if(LOCALAUDIO[key]) URL.revokeObjectURL(LOCALAUDIO[key]);
+  LOCALAUDIO[key]=URL.createObjectURL(file); idbPut(key,file); tName=file.name; AU.bad.clear(); tLoadAudio();
+  tUpMsg("Đang đọc file để dò mốc…");
   try{
-    if(file.size>150*1024*1024){ tUpMsg("File quá lớn (trên 150 MB). Hãy cắt hoặc nén bớt rồi thử lại."); btn.disabled=false; return; }
-    tUpMsg("Đang đọc file…");
-    const AC=window.AudioContext||window.webkitAudioContext, ac=new AC({sampleRate:48000});
-    const ab=await ac.decodeAudioData(await file.arrayBuffer()); if(ac.close) ac.close();
-    const blob=await encodeOpusWebm(ab,p=>tUpMsg("Đang nén audio cho web… "+p+"%"));
-    if(blob.size>19.5*1024*1024) throw {code:"too_large"};
-    tUpMsg("Đang tải lên ("+(blob.size/1048576).toFixed(1)+" MB)…");
-    const r=await ASSETS.upload(blob,{type:"video/webm"});
-    $("tAudio").value="/_blob/"+r.id; tMarks=[]; tEnd=null; tLoadAudio();
-    const n=tSents().length, f=n?tMarksFromBuffer(ab):-1;
-    tUpMsg("Đã tải lên. "+(f<0?"Dán script ở trên rồi bấm “Dò khoảng lặng tự động” để có mốc câu. ":tMarkMsg(f,n)+" ")+"Nhớ bấm Lưu bài.");
-  }catch(e){
-    const c=e&&e.code; tUpMsg(c==="nocodec"?"Trình duyệt này chưa nén được audio. Hãy dùng Chrome hoặc Edge bản mới trên máy tính.":c==="too_large"?"Audio sau khi nén vẫn quá 20 MB. Hãy cắt bớt rồi thử lại.":c==="not_granted"||c==="capability_disabled"?"Tài khoản này chưa có quyền tải file lên trang.":c==="quota_or_state"?"Kho lưu trữ của trang đã đầy.":(e&&e.name==="EncodingError")||(e&&/decode/i.test(String(e.message||"")))?"Không đọc được file này. Thử file mp3, m4a hoặc wav khác.":"Chưa tải lên được, thử lại sau.");
-  }
-  btn.disabled=false; $("tUpFile").value="";
+    const AC=window.AudioContext||window.webkitAudioContext, ac=new AC(), ab=await ac.decodeAudioData(await file.arrayBuffer()); if(ac.close) ac.close();
+    tDur=ab.duration; const n=tSents().length, f=n?tMarksFromBuffer(ab):-1;
+    tUpMsg(f<0?"Đã nhận file. Dán script ở trên rồi bấm “Dò khoảng lặng tự động” để có mốc câu.":tMarkMsg(f,n));
+  }catch(e){ tUpMsg("Đã nhận file để nghe thử nhưng chưa dò tự động được. Hãy đánh dấu tay bằng phím M."); }
 }
-$("tUpBtn").onclick=()=>$("tUpFile").click();
+$("tLocBtn").onclick=()=>$("tLocFile").click();
+$("tLocFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=""; if(f) tPickLocal(f); });
 { const bx=$("tAuBox"), hasF=e=>e.dataTransfer&&Array.from(e.dataTransfer.types||[]).includes("Files"); let dc=0;
   bx.addEventListener("dragenter",e=>{ if(!hasF(e)) return; e.preventDefault(); dc++; bx.classList.add("dropping"); });
-  bx.addEventListener("dragover",e=>{ if(!hasF(e)) return; e.preventDefault(); e.dataTransfer.dropEffect=ASSETS?"copy":"none"; });
+  bx.addEventListener("dragover",e=>{ if(!hasF(e)) return; e.preventDefault(); e.dataTransfer.dropEffect="copy"; });
   bx.addEventListener("dragleave",e=>{ if(!hasF(e)) return; dc=Math.max(0,dc-1); if(!dc) bx.classList.remove("dropping"); });
   bx.addEventListener("drop",e=>{ if(!hasF(e)) return; e.preventDefault(); dc=0; bx.classList.remove("dropping");
-    const f=Array.from(e.dataTransfer.files||[]).find(x=>/^audio\//.test(x.type)||/\.(mp3|m4a|wav|ogg|aac|flac|webm|mp4)$/i.test(x.name));
-    if(!ASSETS){ tUpMsg("Chỉ tài khoản chủ trang (đang đăng nhập) mới tải file lên được."); $("tUpRow").hidden=false; return; }
-    if(!f){ tUpMsg("Hãy thả file âm thanh (mp3, m4a, wav…)."); return; } tUpload(f); }); }
+    const f=Array.from(e.dataTransfer.files||[]).find(x=>/^audio\//.test(x.type)||/\.(mp3|m4a|wav|ogg|aac|flac)$/i.test(x.name));
+    if(!f){ tUpMsg("Hãy thả file âm thanh (mp3, m4a, wav…)."); return; } tPickLocal(f); }); }
 window.addEventListener("dragover",e=>{ if(e.dataTransfer&&Array.from(e.dataTransfer.types||[]).includes("Files")&&!e.target.closest("#tAuBox")) e.preventDefault(); });
 window.addEventListener("drop",e=>{ if(e.dataTransfer&&Array.from(e.dataTransfer.types||[]).includes("Files")&&!e.target.closest("#tAuBox")) e.preventDefault(); });
-$("tUpFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) tUpload(f); });
-try{ if(window.claude&&window.claude.use) window.claude.use("assets").then(a=>{ ASSETS=a; $("tUpRow").hidden=!a; }).catch(()=>{}); }catch(e){}
+function keyUI(){ $("tKey").value=DRIVEKEY; $("tKeyState").textContent=DRIVEKEY?"· đã kết nối":"· chưa kết nối"; }
+$("tKeySave").onclick=async()=>{
+  const k=$("tKey").value.trim(), m=t=>{ $("tKeyMsg").textContent=t; };
+  if(k&&!/^AIza[\w-]{30,}$/.test(k)){ m("Khoá thường bắt đầu bằng AIza và dài khoảng 39 ký tự. Kiểm tra lại."); return; }
+  $("tKeySave").disabled=true;
+  try{
+    if(DB){ await DB.collection("lessons").doc("_cfg").set({driveKey:k,updatedAt:Date.now()}); }
+    else { try{ localStorage.setItem("dg-drivekey",k); }catch(e){} }
+    DRIVEKEY=k; AU.src=""; AU.bad.clear(); keyUI(); m(k?"Đã lưu. Bấm “Thử nghe link” để kiểm tra.":"Đã gỡ khoá."); tLoadAudio();
+  }catch(err){ m("Chưa lưu được khoá: "+(err&&err.code==="permission_denied"?"bạn không có quyền sửa trang này.":"lỗi kết nối.")); }
+  $("tKeySave").disabled=false;
+};
+keyUI();
 /* ===== tách một audio dài thành nhiều bài ===== */
 let tCuts=new Set(), tPartT=[];
-const fmtMS=x=>typeof x==="number"?Math.floor(x/60)+":"+String(Math.floor(x%60)).padStart(2,"0"):"?";
 function tParts(){ const n=tSents().length, c=[0,...[...tCuts].filter(i=>i>0&&i<n).sort((a,b)=>a-b),n]; return c.slice(0,-1).map((a,k)=>({a,b:c[k+1]})); }
 function renderSplit(){
   const sents=tSents(), box=$("tSplitBox"); if(box.hidden) return;
@@ -2393,7 +2398,7 @@ $("tSplitGo").onclick=async()=>{
   const msg=m=>{ $("tSplitMsg").textContent=m; };
   const sents=tSents(), parts=tParts(), url=$("tAudio").value.trim(), keysAll=[...new Set(lines($("tKeys").value))];
   if(parts.length<2){ msg("Tick ít nhất một câu để cắt thành bài mới."); return; }
-  if(!audioSrc(url)){ msg("Chưa có audio hợp lệ."); return; }
+  if(!audioSrc(url)&&!isLocalRef(url)){ msg("Chưa có audio hợp lệ."); return; }
   const m=tMarks.map(x=>typeof x==="number"&&isFinite(x)&&x>=0?Math.round(x*100)/100:null), f=m.filter(x=>x!==null);
   if(f.some((x,i)=>i&&x<=f[i-1])){ msg("Mốc thời gian phải tăng dần, kiểm tra các ô báo đỏ ở trên."); return; }
   for(let k=0;k<parts.length;k++){ if(m[parts[k].a]==null){ msg(`Bài ${k+1} chưa có mốc giây ở câu ${parts[k].a+1}. Dò tự động hoặc điền tay ở danh sách trên.`); return; } }
@@ -2407,7 +2412,7 @@ $("tSplitGo").onclick=async()=>{
     if(keys.length<3){ msg(`Bài ${k+1} chỉ có ${keys.length} từ khoá nằm trong đoạn của nó (cần ít nhất 3). Chọn thêm từ khoá ở phần trên.`); return; }
     const end=q.b<sents.length?m[q.b]:(tEnd||null);
     if(q.b<sents.length&&end==null){ msg(`Bài ${k+2} chưa có mốc giây, cần để biết bài ${k+1} dừng ở đâu.`); return; }
-    out.push({id:(k===0&&id0)?id0:("t"+(stamp+k).toString(36)),l:{title:(tPartT[k]||"").trim()||("Phần "+(k+1)),level:$("tLevel").value,skin:$("tSkin").value,text,keys,noise:noise.filter(n=>!keys.includes(n)),conns,teacher:true,updatedAt:stamp,parent,starred:(k===0&&ex0)?!!ex0.starred:false,trashed:null,audio:{url,marks:m.slice(q.a,q.b),end}}});
+    out.push({id:(k===0&&id0)?id0:("t"+(stamp+k).toString(36)),l:{title:(tPartT[k]||"").trim()||("Phần "+(k+1)),level:$("tLevel").value,skin:$("tSkin").value,text,keys,noise:noise.filter(n=>!keys.includes(n)),conns,teacher:true,updatedAt:stamp,parent,starred:(k===0&&ex0)?!!ex0.starred:false,trashed:null,audio:{url,marks:m.slice(q.a,q.b),end,dur:tDur?Math.round(tDur*100)/100:null,name:tName||(isLocalRef(url)?url.slice(6):null)}}});
   }
   $("tSplitGo").disabled=true; msg("Đang lưu…");
   try{
@@ -2426,7 +2431,7 @@ $("tClean").onclick=()=>{
   $("tText").value=c; $("tText").dispatchEvent(new Event("input",{bubbles:true})); $("tMsg").textContent="Đã làm sạch script. Kiểm tra lại rồi chọn từ khoá ở bên dưới.";
 };
 function lessonAudioState(l){ if(!l.audio||!l.audio.url) return ""; const n=splitSentences(l.text).length, m=l.audio.marks; return Array.isArray(m)&&m.length===n&&m.every(x=>typeof x==="number")?"ok":"warn"; }
-function fillEditor(l){ editingId=l?l.id:null; $("tTitle").value=l?l.title:""; $("tLevel").value=l?l.level:"B1"; $("tSkin").value=(l&&l.skin)||"space"; $("tText").value=l?l.text:""; $("tKeys").value=l?l.keys.join("\n"):""; $("tNoise").value=l?(l.noise||[]).join("\n"):""; $("tConns").value=l?(l.conns||[]).join("\n"):""; $("tMsg").textContent=l?"Đang sửa bài đã lưu.":""; $("tAudio").value=(l&&l.audio&&l.audio.url)||""; tMarks=(l&&l.audio&&Array.isArray(l.audio.marks))?l.audio.marks.slice():[]; tEnd=(l&&l.audio&&l.audio.end)||null; tCuts=new Set(); tPartT=[]; $("tSplitBox").hidden=true; tLoadAudio(); renderPreview(); }
+function fillEditor(l){ editingId=l?l.id:null; $("tTitle").value=l?l.title:""; $("tLevel").value=l?l.level:"B1"; $("tSkin").value=(l&&l.skin)||"space"; $("tText").value=l?l.text:""; $("tKeys").value=l?l.keys.join("\n"):""; $("tNoise").value=l?(l.noise||[]).join("\n"):""; $("tConns").value=l?(l.conns||[]).join("\n"):""; $("tMsg").textContent=l?"Đang sửa bài đã lưu.":""; $("tAudio").value=(l&&l.audio&&l.audio.url)||""; tMarks=(l&&l.audio&&Array.isArray(l.audio.marks))?l.audio.marks.slice():[]; tEnd=(l&&l.audio&&l.audio.end)||null; tName=(l&&l.audio&&l.audio.name)||""; tDur=(l&&l.audio&&l.audio.dur)||null; tCuts=new Set(); tPartT=[]; $("tSplitBox").hidden=true; tLoadAudio(); renderPreview(); }
 $("tNew").onclick=()=>{ newParent=null; fillEditor(null); };
 $("tSave").onclick=async()=>{
   const text=$("tText").value.trim().replace(/\s+/g," "), keys=lines($("tKeys").value);
@@ -2437,10 +2442,10 @@ $("tSave").onclick=async()=>{
   { const ex=gid(id)||null; l.parent=ex?(ex.parent||null):(newParent||null); l.starred=ex?!!ex.starred:false; l.trashed=ex?(ex.trashed||null):null; }
   const aUrl=$("tAudio").value.trim();
   if(aUrl){
-    if(!audioSrc(aUrl)){ $("tMsg").textContent="Link audio cần bắt đầu bằng https:// (hoặc dùng nút tải file lên)"; return; }
+    if(!audioSrc(aUrl)&&!isLocalRef(aUrl)){ $("tMsg").textContent="Link audio cần bắt đầu bằng https://"; return; }
     const ns=tSents().length, m=Array.from({length:ns},(_,i)=>typeof tMarks[i]==="number"&&isFinite(tMarks[i])&&tMarks[i]>=0?Math.round(tMarks[i]*100)/100:null), f=m.filter(x=>x!==null);
     if(f.some((x,i)=>i&&x<=f[i-1])){ $("tMsg").textContent="Mốc thời gian các câu phải tăng dần, kiểm tra các ô báo đỏ."; return; }
-    l.audio={url:aUrl,marks:m,end:tEnd||null};
+    l.audio={url:aUrl,marks:m,end:tEnd||null,dur:tDur?Math.round(tDur*100)/100:null,name:tName||(isLocalRef(aUrl)?aUrl.slice(6):null)};
   } else l.audio=null;
   AU.bad.clear();
   $("tSave").disabled=true;
@@ -2792,7 +2797,8 @@ setTimeout(()=>say("Chào bạn! Bấm ▶ để nghe, rồi bóc từ trong r�
   if(user&&await user.canEdit()) showTeacher("Học viên có link sẽ thấy bài bạn lưu");
   let first=true;
   db.collection("lessons").onSnapshot(snap=>{
-    const list=snap.docs.filter(d=>d.exists).map(d=>mapDoc(d.id,d.data())).filter(l=>isF(l)||(l.text&&l.keys.length));
+    const cfg=snap.docs.find(d=>d.exists&&d.id==="_cfg"); DRIVEKEY=cfg?String((cfg.data()||{}).driveKey||""):""; AU.src=""; keyUI();
+    const list=snap.docs.filter(d=>d.exists&&d.id!=="_cfg").map(d=>mapDoc(d.id,d.data())).filter(l=>isF(l)||(l.text&&l.keys.length));
     setLessons(list);
     if(first&&LESSONS.length&&!(S.p&&S.p.teacher)){ loadPassage(LESSONS[0]); setMode("bank"); }
     first=false;
