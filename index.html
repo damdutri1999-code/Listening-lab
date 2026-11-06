@@ -522,6 +522,9 @@ header.top .passages{display:none}
 .pickwords .pw[aria-pressed="true"].join{border-radius:0 7px 7px 0;margin-left:-4px}
 .pickwords .pw[aria-pressed="true"].joinnext{border-radius:7px 0 0 7px}
 .pickwords .pw[aria-pressed="true"].join.joinnext{border-radius:0}
+.pickwords{user-select:none;-webkit-user-select:none}
+.pickwords .pw.sweep{background:color-mix(in srgb,var(--accent) 45%,transparent);border-color:var(--accent)}
+.pickwords .pw.sweep.erase{background:var(--bad-soft,#F6DDD8);border-color:var(--bad,#B3261E);text-decoration:line-through}
 .pickwords .pp{color:var(--muted);white-space:pre-wrap}
 .pickwords .spk{font:700 12px var(--f-mono);letter-spacing:.06em;color:var(--muted);background:var(--surface-2);border-radius:6px;padding:2px 7px;margin-right:2px}
 .pickwords .pgap{display:block;height:6px}
@@ -991,7 +994,7 @@ header.top .passages{display:none}
           <button class="btn sm" id="tPickClear" type="button">Bỏ chọn hết</button>
           <span class="count" id="tPickN"></span></div>
         <div class="pickwords" id="tPick" aria-label="Các từ trong đoạn văn"><em>Dán đoạn văn ở trên, các từ sẽ hiện ở đây để bạn bấm chọn.</em></div>
-        <p class="count" style="margin:0">Bấm lại từ đã chọn để bỏ. Muốn tách một cụm thì bấm bỏ từ ở giữa. Danh sách bên dưới tự cập nhật theo thứ tự trong bài, bạn vẫn có thể sửa tay.</p>
+        <p class="count" style="margin:0">Bấm một từ để chọn, hoặc nhấn giữ rồi kéo qua nhiều từ để tô cả cụm một lần (kéo qua từ đã chọn để bỏ chọn). Giữ Shift rồi bấm để tô từ từ đã bấm trước đó đến từ này. Muốn tách một cụm thì bấm bỏ từ ở giữa. Danh sách bên dưới tự cập nhật theo thứ tự trong bài, bạn vẫn có thể sửa tay.</p>
       </div>
       <div class="cols">
         <label>Từ khoá — mỗi dòng một từ/cụm, theo thứ tự trong bài<textarea id="tKeys" placeholder="every morning&#10;drinks water&#10;goes for a walk"></textarea></label>
@@ -2172,7 +2175,6 @@ function renderPick(){
     if(t.spk) return g+`<b class="spk">${esc(t.w)}</b>`;
     return g+`<button type="button" class="pw${jp?" join":""}${jn?" joinnext":""}" data-i="${i}" aria-pressed="${!!pickGrp[i]}">${esc(t.w)}</button>`;
   }).join("")+(tail.trim()?`<span class="pp">${gapHtml(tail)}</span>`:"");
-  box.querySelectorAll(".pw").forEach(b=>b.onclick=()=>pickToggle(+b.dataset.i));
   $("tPickN").textContent=lines($("tKeys").value).length+" từ khoá";
 }
 function pickToggle(i){
@@ -2183,6 +2185,30 @@ function pickToggle(i){
   else pickGrp[i]=Math.max(0,...pickGrp)+1;
   pickWrite();
 }
+let pk=null, pkPainted=false, pickLast=null;
+function pickPaint(lo,hi,mode){
+  const merge=$("tMerge").checked; let g=Math.max(0,...pickGrp)+1;
+  for(let i=lo;i<=hi;i++){ if(pickToks[i].spk) continue; if(mode==="erase") pickGrp[i]=0; else { pickGrp[i]=g; if(!merge) g++; } }
+  pickWrite();
+}
+const pkIdx=e=>{ const el=document.elementFromPoint(e.clientX,e.clientY), b=el&&el.closest?el.closest(".pw"):null; return b&&$("tPick").contains(b)?+b.dataset.i:-1; };
+function pkShow(){ const lo=pk?Math.min(pk.a,pk.cur):0, hi=pk?Math.max(pk.a,pk.cur):-1, on=!!pk&&pk.cur!==pk.a; $("tPick").querySelectorAll(".pw").forEach(b=>{ const i=+b.dataset.i, w=on&&i>=lo&&i<=hi; b.classList.toggle("sweep",w); b.classList.toggle("erase",w&&pk.mode==="erase"); }); }
+$("tPick").addEventListener("pointerdown",e=>{ if(e.button!==0||e.shiftKey) return; const i=pkIdx(e); if(i<0) return; pk={a:i,cur:i,mode:pickGrp[i]?"erase":"select"}; });
+document.addEventListener("pointermove",e=>{
+  if(!pk) return; const i=pkIdx(e); if(i>=0&&i!==pk.cur){ pk.cur=i; pkShow(); }
+  const box=$("tPick"), r=box.getBoundingClientRect(); if(e.clientY<r.top+24) box.scrollTop-=14; else if(e.clientY>r.bottom-24) box.scrollTop+=14;
+});
+document.addEventListener("pointerup",()=>{
+  if(!pk) return; const p=pk; pk=null; pkShow();
+  if(p.cur!==p.a){ pkPainted=true; setTimeout(()=>{ pkPainted=false; },120); const lo=Math.min(p.a,p.cur), hi=Math.max(p.a,p.cur); pickLast=p.cur; pickPaint(lo,hi,p.mode); }
+});
+document.addEventListener("pointercancel",()=>{ pk=null; pkShow(); });
+$("tPick").addEventListener("click",e=>{
+  const b=e.target.closest(".pw"); if(!b||pkPainted) return; const i=+b.dataset.i;
+  if(e.shiftKey&&pickLast!=null&&pickLast!==i){ pickPaint(Math.min(pickLast,i),Math.max(pickLast,i),"select"); }
+  else pickToggle(i);
+  pickLast=i;
+});
 function pickWrite(){
   const out=[]; let cur=null;
   pickToks.forEach((t,i)=>{
